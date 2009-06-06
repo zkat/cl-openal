@@ -9,6 +9,21 @@
 (defcstruct context)
 (defctype boolean (:boolean :unsigned-char))
 
+(defcenum attribute
+  (:frequency #x1007)
+  (:refresh #x1008)
+  (:sync #x1009)
+  (:mono-sources #x1010)
+  (:stereo-sources #x1011))
+
+(defcenum error
+  (:no-error #x0000)
+  (:invalid-device #xA001)
+  (:invalid-context #xA002)
+  (:invalid-enum #xA003)
+  (:invalid-value #xA004)
+  (:out-of-memory #xA005))
+
 (defcenum enum
   (:false #x0000)
   (:true #x0001)
@@ -17,15 +32,12 @@
   (:sync #x1009)
   (:mono-sources #x1010)
   (:stereo-sources #x1011)
-
-  ;; errors
   (:no-error #x0000)
   (:invalid-device #xA001)
   (:invalid-context #xA002)
   (:invalid-enum #xA003)
   (:invalid-value #xA004)
   (:out-of-memory #xA005)
-  
   (:default-device-specifier #x1004)
   (:device-specifier #x1005)
   (:extensions #x1006)
@@ -35,13 +47,12 @@
   (:all-attributes #x1003)
   (:default-all-devices-specifier #x1012)
   (:all-devices-specifier #x1013)
-  
   (:capture-device-specifier #x310)
   (:capture-default-device-specifier #x311)
   (:capture-samples #x312))
 
 ;; Context Management
-(defcfun ("alcCreateContext" create-context) :pointer (device device) (attrlist :pointer))
+(defcfun ("alcCreateContext" create-context) :pointer (device device) (attrlist (:pointer attribute)))
 (defcfun ("alcMakeContextCurrent" make-context-current) :boolean (context context))
 (defcfun ("alcProcessContext" process-context) :void (context context))
 (defcfun ("alcSuspendContext" suspend-context) :void (context context))
@@ -54,7 +65,7 @@
 (defcfun ("alcCloseDevice" close-device) :boolean (device device))
 
 ;; Error support
-(defcfun ("alcGetError" get-error) enum (device device))
+(defcfun ("alcGetError" get-error) error (device device))
 
 ;; Extension support
 (defcfun ("alcIsExtensionPresent" is-extension-present) :boolean (device device) (extname :string))

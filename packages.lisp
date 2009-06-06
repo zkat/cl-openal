@@ -78,7 +78,7 @@
   (:use :cl :cffi)
   (:nicknames :%alc)
   (:export
-   :enum :device :context :boolean
+   :attribute :error :enum :device :context :boolean 
    ;; Context management
    :create-context :make-context-current :process-context :suspend-context :destroy-context
    :get-current-context :get-current-contexts-device
