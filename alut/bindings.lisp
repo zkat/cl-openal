@@ -6,6 +6,45 @@
   (t (:default ("libalut"))))
 (use-foreign-library alut)
 
+(define-foreign-type ensure-integer ()
+  ()
+  (:actual-type :int)
+  (:simple-parser ensure-integer))
+
+(defmethod translate-to-foreign (value (type ensure-integer))
+  (truncate value))
+
+(defmethod expand-to-foreign (value (type ensure-integer))
+  (if (constantp value)
+      (truncate (eval value))
+      `(truncate ,value)))
+
+(define-foreign-type ensure-float ()
+  ()
+  (:actual-type :float)
+  (:simple-parser ensure-float))
+
+(defmethod translate-to-foreign (value (type ensure-float))
+  (cl:float value 1.0))
+
+(defmethod expand-to-foreign (value (type ensure-float))
+  (if (constantp value)
+      (cl:float (eval value) 1.0)
+      `(cl:float ,value 1.0)))
+
+(define-foreign-type ensure-double ()
+  ()
+  (:actual-type :double)
+  (:simple-parser ensure-double))
+
+(defmethod translate-to-foreign (value (type ensure-double))
+  (cl:float value 1.0d0))
+
+(defmethod expand-to-foreign (value (type ensure-double))
+  (if (constantp value)
+      (cl:float (eval value) 1.0d0)
+      `(cl:float ,value 1.0d0)))
+
 (defcenum api
   (:major-version 1)
   (:minor-version 1))
@@ -42,6 +81,15 @@
   (:buffer #x300)
   (:memory #x301))
 
+(define-foreign-type pathname-string-type ()
+  ()
+  (:actual-type :string)
+  (:simple-parser pathname-string))
+(eval-when (:compile-toplevel :load-toplevel)
+  (defmethod expand-to-foreign-dyn (value var body (type pathname-string-type))
+    `(with-foreign-string (,var (if (pathnamep ,value) (namestring ,value) ,value))
+       ,@body)))
+
 (defcfun ("alutInit" init) :boolean (argcp :pointer) (argv :pointer))
 (defcfun ("alutInitWithoutContext" init-without-context) :boolean
   (argcp :pointer) (argv :pointer))
@@ -51,17 +99,17 @@
 (defcfun ("alutGetErrorString" get-error-string) :string (err error))
 
 (defcfun ("alutCreateBufferFromFile" create-buffer-from-file) :uint
-  (filename :string))
+  (filename pathname-string))
 (defcfun ("alutCreateBufferFromFileImage" create-buffer-from-file-image) :uint
-  (data :pointer) (length :int))
+  (data (:pointer :void)) (length :int))
 (defcfun ("alutCreateBufferHelloWorld" create-buffer-hello-world) :uint)
 (defcfun ("alutCreateBufferWaveform" create-buffer-waveform) :uint
-  (waveshape waveform) (frequency :float) (phase :float) (duration :float))
+  (waveshape waveform) (frequency ensure-float) (phase ensure-float) (duration ensure-float))
 
 (defcfun ("alutLoadMemoryFromFile" load-memory-from-file) :void
-  (filename :string) (format :pointer) (size :pointer) (frequency :pointer))
+  (filename pathname-string) (format :pointer) (size :pointer) (frequency :pointer))
 (defcfun ("alutLoadMemoryFromFileImage" load-memory-from-file-image) :void
-  (data :pointer) (length :int) (format :pointer) (size :pointer) (frequency :pointer))
+  (data (:pointer :void)) (length :int) (format :pointer) (size :pointer) (frequency :pointer))
 (defcfun ("alutLoadMemoryHelloWorld" load-memory-hello-world) :void
   (format :pointer) (size :pointer) (frequency :pointer))
 (defcfun ("alutLoadMemoryWaveform" load-memory-waveform) :void
@@ -74,4 +122,4 @@
 (defcfun ("alutGetMajorVersion" get-major-version) :int)
 (defcfun ("alutGetMinorVersion" get-minor-version) :int)
 
-(defcfun ("alutSleep" sleep) :boolean (duration :float))
+(defcfun ("alutSleep" sleep) :boolean (duration ensure-float))
