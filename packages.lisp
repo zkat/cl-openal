@@ -6,7 +6,7 @@
 (defpackage #:alc
   (:use :cl))
 (defpackage #:%alc
-  (:use :cl :cffu))
+  (:use :cl :cffi))
 
 (defpackage #:alut
   (:use :cl))
