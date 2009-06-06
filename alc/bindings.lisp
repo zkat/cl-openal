@@ -1,4 +1,3 @@
-;; TODO: do enums
 (in-package :%alc)
 
 (define-foreign-library al
