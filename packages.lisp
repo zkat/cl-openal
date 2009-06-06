@@ -17,8 +17,14 @@
 
 
 (defpackage #:cl-openal-alut
-  (:use :cl)
-  (:nicknames :alut))
+  (:use :cl :al)
+  (:nicknames :alut)
+  (:shadow :sleep)
+  (:export
+   :init :init-without-context :exit :get-error :get-error-string :create-buffer-from-file
+   :create-buffer-from-file-image :create-buffer-hello-world :create-buffer-waveform
+   :load-memory-from-file :load-memory-from-file-image :load-memory-hello-world :load-memory-waveform
+   :get-mime-types :get-major-version :get-minor-version :sleep))
 
 
 ;;;
@@ -28,7 +34,7 @@
   (:use :cl :cffi)
   (:nicknames :%al)
   (:export
-   :enum :boolean :byte :ubyte
+   :enum :boolean :byte :ubyte :ensure-float :ensure-integer :ensure-double
    ;; renderer state management
    :enable :disable :is-enabled
    ;; state retrieval
