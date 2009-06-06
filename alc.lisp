@@ -6,6 +6,8 @@
   (t (:default "libopenal")))
 (use-foreign-library al)
 
+(defcstruct device)
+(defcstruct context)
 (defctype boolean (:boolean :unsigned-char))
 
 (defcenum enum
@@ -40,36 +42,36 @@
   (:capture-samples #x312))
 
 ;; Context Management
-(defcfun ("alcCreateContext" create-context) :pointer (device :pointer) (attrlist :pointer))
-(defcfun ("alcMakeContextCurrent" make-context-current) :boolean (context :pointer))
-(defcfun ("alcProcessContext" process-context) :void (context :pointer))
-(defcfun ("alcSuspendContext" suspend-context) :void (context :pointer))
-(defcfun ("alcDestroyContext" destroy-context) :void (context :pointer))
-(defcfun ("alcGetCurrentContext" get-current-context) :pointer)
-(defcfun ("alcGetContextsDevice" get-contexts-device) :pointer (context :pointer))
+(defcfun ("alcCreateContext" create-context) :pointer (device device) (attrlist :pointer))
+(defcfun ("alcMakeContextCurrent" make-context-current) :boolean (context context))
+(defcfun ("alcProcessContext" process-context) :void (context context))
+(defcfun ("alcSuspendContext" suspend-context) :void (context context))
+(defcfun ("alcDestroyContext" destroy-context) :void (context context))
+(defcfun ("alcGetCurrentContext" get-current-context) context)
+(defcfun ("alcGetContextsDevice" get-contexts-device) device (context context))
 
 ;; Device Management
-(defcfun ("alcOpenDevice" open-device) :pointer (device-name :pointer))
-(defcfun ("alcCloseDevice" close-device) :pointer (device :pointer))
+(defcfun ("alcOpenDevice" open-device) device (device-name :string))
+(defcfun ("alcCloseDevice" close-device) :boolean (device device))
 
 ;; Error support
-(defcfun ("alcGetError" get-error) enum (device :pointer))
+(defcfun ("alcGetError" get-error) enum (device device))
 
 ;; Extension support
-(defcfun ("alcIsExtensionPresent" is-extension-present) :boolean (device :pointer) (extname :string))
+(defcfun ("alcIsExtensionPresent" is-extension-present) :boolean (device device) (extname :string))
 (defcfun ("alcGetProcAddress" get-proc-address) :pointer (funcname :string))
-(defcfun ("alcGetEnumValue" get-enum-value) enum (device :pointer) (enumname :string))
+(defcfun ("alcGetEnumValue" get-enum-value) enum (device device) (enumname :string))
 
 ;; Query functions
-(defcfun ("alcGetString" get-string) :string (device :pointer) (param enum))
+(defcfun ("alcGetString" get-string) :string (device device) (param enum))
 (defcfun ("alcGetIntegerv" get-integer-v) :void
-  (device :pointer) (param enum) (size :int) (data :pointer))
+  (device device) (param enum) (size :int) (data :pointer))
 
 ;; Capture functions
-(defcfun ("alcCaptureOpenDevice" capture-open-device) :pointer 
+(defcfun ("alcCaptureOpenDevice" capture-open-device) device
   (device-name :string) (frequency :uint) (format enum) (buffer-size :int))
-(defcfun ("alcCaptureCloseDevice" capture-close-device) :boolean (device :pointer))
-(defcfun ("alcCaptureStart" capture-start) :void (device :pointer))
-(defcfun ("alcCaptureStop" capture-stop) :void (device :pointer))
+(defcfun ("alcCaptureCloseDevice" capture-close-device) :boolean (device device))
+(defcfun ("alcCaptureStart" capture-start) :void (device device))
+(defcfun ("alcCaptureStop" capture-stop) :void (device device))
 (defcfun ("alcCaptureSamples" capture-samples) :void
-  (device :pointer) (buffer :pointer) (samples :int))
+  (device device) (buffer :pointer) (samples :int))
