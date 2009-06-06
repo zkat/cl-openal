@@ -1,10 +1,13 @@
-;; TODO: get enums in here
 (in-package :%al)
 
 (define-foreign-library al
   (:unix (:or "libopenal" "libopenal.so.1"))
   (t (:default "libopenal")))
 (use-foreign-library al)
+
+(defctype boolean (:boolean :char))
+(defctype byte (:char))
+(defctype ubyte (:unsigned-char))
 
 (defcenum enum
   (:none #x0000)
@@ -148,7 +151,7 @@
 ;;;
 
 ;; Source objects
-(defcfun ("alGenSources" get-sources) :void (n :int) (sources :pointer))
+(defcfun ("alGenSources" gen-sources) :void (n :int) (sources :pointer))
 (defcfun ("alDeleteSources" delete-sources) :void (n :int) (sources :pointer))
 (defcfun ("alIsSource" is-source) :boolean (sid :uint))
 
