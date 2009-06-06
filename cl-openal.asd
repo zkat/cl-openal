@@ -3,7 +3,7 @@
   :description "OpenAL bindings"
   :maintainer "Josh <sykopomp@sykosomatic.org>"
   :author "Josh <sykopomp@sykosomatic.org>"
-  :licence "Public Domain"
+  :licence "public domain"
   :depends-on (cffi)
   :serial t
   :components
