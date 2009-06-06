@@ -5,6 +5,40 @@
   (:unix (:or "libopenal" "libopenal.so.1"))
   (t (:default "libopenal")))
 (use-foreign-library al)
+
+(defctype boolean (:boolean :unsigned-char))
+
+(defcenum enum
+  (:false #x0000)
+  (:true #x0001)
+  (:frequency #x1007)
+  (:refresh #x1008)
+  (:sync #x1009)
+  (:mono-sources #x1010)
+  (:stereo-sources #x1011)
+
+  ;; errors
+  (:no-error #x0000)
+  (:invalid-device #xA001)
+  (:invalid-context #xA002)
+  (:invalid-enum #xA003)
+  (:invalid-value #xA004)
+  (:out-of-memory #xA005)
+  
+  (:default-device-specifier #x1004)
+  (:device-specifier #x1005)
+  (:extensions #x1006)
+  (:major-version #x1000)
+  (:minor-version #x1001)
+  (:attributes-size #x1002)
+  (:all-attributes #x1003)
+  (:default-all-devices-specifier #x1012)
+  (:all-devices-specifier #x1013)
+  
+  (:capture-device-specifier #x310)
+  (:capture-default-device-specifier #x311)
+  (:capture-samples #x312))
+
 ;; Context Management
 (defcfun ("alcCreateContext" create-context) :pointer (device :pointer) (attrlist :pointer))
 (defcfun ("alcMakeContextCurrent" make-context-current) :boolean (context :pointer))
