@@ -39,8 +39,6 @@
   (%alc:get-current-context))
 (defun get-contexts-device (context)
   (%alc:get-contexts-device context))
-(defun device-of (context)
-  (%alc:get-contexts-device context))
 
 (defun get-error (device)
   (%alc:get-error device))

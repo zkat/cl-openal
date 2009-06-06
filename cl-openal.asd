@@ -3,7 +3,7 @@
   :description "OpenAL bindings"
   :maintainer "Kat <kzm@sykosomatic.org>"
   :author "Kat <kzm@sykosomatic.org>"
-  :licence "Public Domain"
+  :licence "public domain"
   :depends-on (cffi)
   :serial t
   :components
