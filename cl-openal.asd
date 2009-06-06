@@ -6,5 +6,9 @@
   :licence "Public Domain"
   :depends-on (cffi)
   :serial t
-  :components ((:file "packages")))
+  :components ((:file "packages")
+               (:file "al.lisp")
+               (:file "alc.lisp")
+               (:file "alut.lisp")))
+
 
