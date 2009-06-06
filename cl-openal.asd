@@ -7,8 +7,8 @@
   :depends-on (cffi)
   :serial t
   :components ((:file "packages")
-               (:file "al.lisp")
-               (:file "alc.lisp")
-               (:file "alut.lisp")))
+               (:file "al")
+               (:file "alc")
+               (:file "alut")))
 
 
