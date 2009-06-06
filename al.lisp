@@ -1,5 +1,5 @@
 ;; TODO: get enums in here
-(in-package :al)
+(in-package :%al)
 
 (define-foreign-library al
   (:unix (:or "libopenal" "libopenal.so.1"))
