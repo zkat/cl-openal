@@ -6,23 +6,99 @@
   (t (:default "libopenal")))
 (use-foreign-library al)
 
-(defctype boolean :char)
-(defctype char :char)
-(defctype byte :char)
-(defctype ubyte :unsigned-char)
-(defctype short :short)
-(defctype ushort :unsigned-short)
-(defctype int :int)
-(defctype uint :unsigned-int)
-(defctype enum :int)
-(defctype float :float)
-(defctype double :double)
-(defctype void :void)
+(defcenum enum
+  (:none #x0000)
+  (:false #x0000)
+  (:true #x0001)
+  (:source-relative #x202)
+  (:cone-inner-angle #x1001)
+  (:cone-outer-angle #x1002)
+  (:pitch #x1003)
+
+  ;; Location
+  (:position #x1004)
+  (:direction #x1005)
+  (:velocity #x1006)
+
+  (:looping #x1007)
+  (:buffer #x1009)
+  (:gain #x100A)
+  (:min-gain #x100D)
+  (:max-gain #x100E)
+  (:orientation #x100F)
+  (:source-state #x1010)
+  (:initial #x1011)
+  (:playing #x1012)
+  (:paused #x1013)
+  (:stopped #x1014)
+  (:buffers-queued #x1015)
+  (:buffers-processed #x1016)
+  (:sec-offset #x1024)
+  (:sample-offset #x1025)
+  (:byte-offset #x1026)
+
+  ;; Source types
+  (:source-type #x1027)
+  (:static #x1028)
+  (:streaming #x1029)
+  (:undetermined #x1030)
+
+  ;; sound sample formats
+  (:mono8 #x1100)
+  (:mono16 #x1101)
+  (:stereo8 #x1102)
+  (:stereo16 #x1103)
+
+  ;; more sound sample stuff?
+  (:reference-distance #x1020)
+  (:rolloff-factor #x1021)
+  (:cone-outer-gain #x1022)
+  (:max-distance #x1023)
+
+  ;; Sound sample frequency
+  (:frequency #x2001)
+  (:bits #x2002)
+  (:channels #x2003)
+  (:size #x2004)
+
+  ;; Buffer state
+  (:unused #x2010)
+  (:pending #x2011)
+  (:processed #x2012)
+
+  ;; errors
+  (:no-error #x0000)
+  (:invalid-name #xA001)
+  (:invalid-enum #xA002)
+  (:invalid-value #xA003)
+  (:invalid-operation #xA004)
+  (:out-of-memory #xA005)
+
+  ;; Context strings: vendor name
+  (:vendor #xB001)
+  (:version #xB002)
+  (:renderer #xB003)
+  (:extensions #xB004)
+
+  ;; Global tweakage
+  (:doppler-factor #xC000)
+  (:doppler-velocity #xC001)
+  (:speed-of-sound #xC003)
+
+  ;; Distance model
+  (:distance-model #xD000)
+  (:inverse-distance #xD001)
+  (:inverse-distance-clamped #xD002)
+  (:linear-distance #xD003)
+  (:linear-distance-clamped #xD004)
+  (:exponent-distance #xD005)
+  (:exponent-distance-clamped #xD006))
+
 
 ;; Renderer State management
-(defcfun ("alEnable" enable) :void (target enum))
-(defcfun ("alDisable" disable) :void (target enum))
-(defcfun ("alIsEnabled" is-enabled) :boolean (target enum))
+(defcfun ("alEnable" enable) :void (capability enum))
+(defcfun ("alDisable" disable) :void (capability enum))
+(defcfun ("alIsEnabled" is-enabled) :boolean (capability enum))
 
 ;; State retrieval
 (defcfun ("alGetString" get-string) :string (param enum))
@@ -36,7 +112,7 @@
 (defcfun ("alGetDouble" get-double) :void (param enum))
 
 ;; Error support
-(defcfun ("alGetError" get-error) :enum)
+(defcfun ("alGetError" get-error) enum)
 
 ;; Extension support
 (defcfun ("alIsExtensionPresent" is-extension-present) :boolean (extname :string))
@@ -99,10 +175,10 @@
 ;;; Playback
 
 ;; Source vector based
-(defcfun ("alSourcePlayv" source-play-v) :void (ns :i) (sids :pointer))
-(defcfun ("alSourceStopv" source-stop-v) :void (ns :i) (sids :pointer))
-(defcfun ("alSourceRewindv" source-rewind-v) :void (ns :i) (sids :pointer))
-(defcfun ("alSourcePausev" source-pause-v) :void (ns :i) (sids :pointer))
+(defcfun ("alSourcePlayv" source-play-v) :void (ns :int) (sids :pointer))
+(defcfun ("alSourceStopv" source-stop-v) :void (ns :int) (sids :pointer))
+(defcfun ("alSourceRewindv" source-rewind-v) :void (ns :int) (sids :pointer))
+(defcfun ("alSourcePausev" source-pause-v) :void (ns :int) (sids :pointer))
 
 ;; Source based
 (defcfun ("alSourcePlay" source-play) :void (sid :uint))
@@ -153,5 +229,5 @@
 (defcfun ("alDopplerFactor" doppler-factor) :void (value :float))
 (defcfun ("alDopplerVelocity" doppler-velocity) :void (value :float))
 (defcfun ("alSpeedOfSound" speed-of-sound) :void (value :float))
-(defcfun ("alDistanceModel" distance-model) :void (distance-model :enum))
+(defcfun ("alDistanceModel" distance-model) :void (distance-model enum))
 
