@@ -6,3 +6,7 @@ There are some convenient additions, though, such as being able to pass lists in
 of having to allocate foreign objects (and receive lists from some functions that would require
 pointers). Things should be pretty clear by just looking at packages.lisp, or the source files.
 Actual documentation will come eventually. These are very new, so use them at your own risk.
+
+cl-openal depends on CFFI to load. You'll also need to have openal and alut installed in your
+system, and accessible to lisp.
+
