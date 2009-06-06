@@ -1,14 +1,20 @@
-(defpackage #:al
-  (:use :cl))
-(defpackage #:%al
-  (:use :cl :cffi))
+(defpackage #:cl-openal
+  (:use :cl)
+  (:nicknames :al))
+(defpackage #:openal-cffi-bindings
+  (:use :cl :cffi)
+  (:nicknames :%al))
 
-(defpackage #:alc
-  (:use :cl))
-(defpackage #:%alc
-  (:use :cl :cffi))
+(defpackage #:cl-openal-alc
+  (:use :cl)
+  (:nicknames :alc))
+(defpackage #:alc-cffi-bindings
+  (:use :cl :cffi)
+  (:nicknames :%alc))
 
-(defpackage #:alut
-  (:use :cl))
-(defpackage #:%alut
-  (:use :cl :cffi))
+(defpackage #:cl-openal-alut
+  (:use :cl)
+  (:nicknames :alut))
+(defpackage #:alut-cffi-bindings
+  (:use :cl :cffi)
+  (:nicknames :%alut))
