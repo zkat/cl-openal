@@ -6,9 +6,23 @@
   :licence "Public Domain"
   :depends-on (cffi)
   :serial t
-  :components ((:file "packages")
-               (:file "al")
-               (:file "alc")
-               (:file "alut")))
+  :components
+  ((:file "packages")
+   (:module al
+            :serial t
+            :components
+            ((:file "bindings")
+             (:file "al")))
+   (:module alc
+            :serial t
+            :components
+            ((:file "bindings")
+             (:file "alc")))
+   (:module alut
+            :serial t
+            :components
+            ((:file "bindings")
+             (:file "alut")))))
+
 
 
