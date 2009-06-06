@@ -86,7 +86,7 @@
    :attribute :error :enum :device :context :boolean 
    ;; Context management
    :create-context :make-context-current :process-context :suspend-context :destroy-context
-   :get-current-context :get-current-contexts-device
+   :get-current-context :get-contexts-device
    ;; device management
    :open-device :close-device
    ;; errors
