@@ -5,10 +5,48 @@
   (t (:default "libopenal")))
 (use-foreign-library al)
 
+(define-foreign-type ensure-integer ()
+  ()
+  (:actual-type :int)
+  (:simple-parser ensure-integer))
+
+(defmethod translate-to-foreign (value (type ensure-integer))
+  (truncate value))
+
+(defmethod expand-to-foreign (value (type ensure-integer))
+  (if (constantp value)
+      (truncate (eval value))
+      `(truncate ,value)))
+
+(define-foreign-type ensure-float ()
+  ()
+  (:actual-type :float)
+  (:simple-parser ensure-float))
+
+(defmethod translate-to-foreign (value (type ensure-float))
+  (cl:float value 1.0))
+
+(defmethod expand-to-foreign (value (type ensure-float))
+  (if (constantp value)
+      (cl:float (eval value) 1.0)
+      `(cl:float ,value 1.0)))
+
+(define-foreign-type ensure-double ()
+  ()
+  (:actual-type :double)
+  (:simple-parser ensure-double))
+
+(defmethod translate-to-foreign (value (type ensure-double))
+  (cl:float value 1.0d0))
+
+(defmethod expand-to-foreign (value (type ensure-double))
+  (if (constantp value)
+      (cl:float (eval value) 1.0d0)
+      `(cl:float ,value 1.0d0)))
+
 (defctype boolean (:boolean :char))
 (defctype byte (:char))
 (defctype ubyte (:unsigned-char))
-
 (defcenum enum
   (:none #x0000)
   (:false #x0000)
@@ -129,7 +167,7 @@
 ;; Set Listener parameters
 (defcfun ("alListenerf" listener-f) :void (param enum) (value :float))
 (defcfun ("alListener3f" listener-3f) :void
-  (param enum) (value1 :float) (value2 :float) (value3 :float))
+  (param enum) (value1 ensure-float) (value2 ensure-float) (value3 ensure-float))
 (defcfun ("alListenerfv" listener-fv) :void (param enum) (values :pointer))
 (defcfun ("alListeneri" listener-i) :void (param enum) (value :int))
 (defcfun ("alListener3i" listener-3i) :void 
@@ -158,7 +196,7 @@
 ;; Set Source parameters
 (defcfun ("alSourcef" source-f) :void (sid :uint) (param enum) (value :float))
 (defcfun ("alSource3f" source-3f) :void
-  (sid :uint) (param enum) (value1 :float) (value2 :float) (value3 :float))
+  (sid :uint) (param enum) (value1 ensure-float) (value2 ensure-float) (value3 ensure-float))
 (defcfun ("alSourcefv" source-fv) :void (sid :uint) (param enum) (values :pointer))
 (defcfun ("alSourcei" source-i) :void (sid :uint) (param enum) (value :int))
 (defcfun ("alSource3i" source-3i) :void 
@@ -211,7 +249,7 @@
 ;; Set Buffer parameters
 (defcfun ("alBufferf" buffer-f) :void (bid :uint) (param enum) (value :float))
 (defcfun ("alBuffer3f" buffer-3f) :void
-  (bid :uint) (param enum) (value1 :float) (value2 :float) (value3 :float))
+  (bid :uint) (param enum) (value1 ensure-float) (value2 ensure-float) (value3 ensure-float))
 (defcfun ("alBufferfv" buffer-fv) :void (bid :uint) (param enum) (values :pointer))
 (defcfun ("alBufferi" buffer-i) :void (bid :uint) (param enum) (value :int))
 (defcfun ("alBuffer3i" buffer-3i) :void 
@@ -229,8 +267,8 @@
 (defcfun ("alGetBufferiv" get-buffer-iv) :void (bid :uint) (param enum) (values :pointer))
 
 ;; Global Parameters
-(defcfun ("alDopplerFactor" doppler-factor) :void (value :float))
-(defcfun ("alDopplerVelocity" doppler-velocity) :void (value :float))
-(defcfun ("alSpeedOfSound" speed-of-sound) :void (value :float))
+(defcfun ("alDopplerFactor" doppler-factor) :void (value ensure-float))
+(defcfun ("alDopplerVelocity" doppler-velocity) :void (value ensure-float))
+(defcfun ("alSpeedOfSound" speed-of-sound) :void (value ensure-float))
 (defcfun ("alDistanceModel" distance-model) :void (distance-model enum))
 
