@@ -32,8 +32,13 @@
 ;;;
 ;;; Listener
 ;;;
-(defun listener (param value1 value2 value3)
-  (%al:listener-3f param value1 value2 value3))
+(defun listener (param value)
+  (ecase param
+    ((:position :velocity :orientation)
+     (assert (= 3 (length value)))
+     (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
+    ((:gain)
+     (%al:listener-f param value))))
 
 (defun get-listener (param)
   (cffi:with-foreign-object (listener-array :float 3)
@@ -66,25 +71,46 @@
   (%al:is-source sid))
 
 (defun source (sid param value)
-  (cond ((and (or (listp value)
-                  (vectorp value))
-              (= 3 (length value))
-              (every #'numberp value))
-         (%al:source-3f sid param (float (elt value 0) 1.0)
-                        (float (elt value 1) 1.0) (float (elt value 2) 1.0)))
-        ((integerp value)
-         (%al:source-i sid param value))
-        ((floatp value)
-         (%al:source-f sid param value))
-        (t
-         (%al:source-i sid param (if value
-                                     1 0)))))
+  (ecase param
+    ((:gain :pitch :min-gain :max-gain :reference-distance :rolloff-factor :max-distance
+      :sec-offset :sample-offset :byte-offset :cone-inner-angle :cone-outer-angle :cone-outer-gain)
+     (%al:source-f sid param value))
+    ((:looping :source-relative)
+     (%al:source-i sid param (if value 1 0)))
+    ((:source-type :buffer)
+     (%al:source-i sid param value))
+    ((:position :velocity :direction)
+     (assert (= 3 (length value)))
+     (%al:source-3f sid param (elt value 0) (elt value 1) (elt value 2)))))
 
 (defun get-source (sid param)
-  (cffi:with-foreign-object (source-array :float 3)
-    (%al:get-source-fv sid param source-array)
-    (loop for i below 3
-         collect (cffi:mem-aref source-array :float i))))
+  (ecase param
+    ((:gain :pitch :min-gain :max-gain :reference-distance
+      :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
+      :sample-offset :byte-offset)
+     (let* ((ptr (cffi:foreign-alloc :int))
+            (val (progn 
+                   (%al:get-source-f sid param ptr)
+                   (cffi:mem-ref ptr :int))))
+       val))
+    ((:looping :source-relative)
+     (let* ((ptr (cffi:foreign-alloc :int))
+            (val (progn 
+                   (%al:get-source-i sid param ptr)
+                   (cffi:mem-ref ptr :int))))
+       (if (> val 0)
+           t nil)))
+    ((:source-type :buffer :buffers-queued :buffers-processed)
+     (let* ((ptr (cffi:foreign-alloc :int))
+            (val (progn 
+                   (%al:get-source-i sid param ptr)
+                   (cffi:mem-ref ptr :int))))
+       val))
+    ((:position :velocity :direction)
+     (cffi:with-foreign-object (source-array :float 3)
+       (%al:get-source-fv sid param source-array)
+       (loop for i below 3
+          collect (cffi:mem-aref source-array :float i))))))
 
 ;; Playback
 (defun source-play (sid)
@@ -137,25 +163,22 @@
   (%al:is-buffer buffer-id))
 
 (defun buffer (bid param value)
-  (cond ((and (or (listp value)
-                  (vectorp value))
-              (= 3 (length value))
-              (every #'numberp value))
-         (%al:buffer-3f bid param (float (elt value 0) 1.0)
-                        (float (elt value 1) 1.0) (float (elt value 2) 1.0)))
-        ((integerp value)
-         (%al:buffer-i bid param value))
-        ((floatp value)
-         (%al:buffer-f bid param value))
-        (t
-         (%al:buffer-i bid param (if value
-                                     1 0)))))
+  (%al:buffer-i bid param value))
+
+(defun buffer-data (bid format data size freq)
+  (let ((len (length data)))
+    (cffi:with-foreign-object (data-array :int len)
+      (loop for i below len
+           do (setf (cffi:mem-aref data-array i)
+                    (elt data i)))
+      (%al:buffer-data bid format data-array size freq))))
 
 (defun get-buffer (bid param)
-  (cffi:with-foreign-object (buffer-array :float 3)
-    (%al:get-buffer-fv bid param buffer-array)
-    (loop for i below 3
-         collect (cffi:mem-aref buffer-array :float i))))
+  (let* ((ptr (cffi:foreign-alloc :int))
+         (val (progn 
+                (%al:get-buffer-i bid param ptr)
+                (cffi:mem-ref ptr :int))))
+    val))
 
 ;;;
 ;;; Global parameters
