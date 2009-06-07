@@ -65,8 +65,21 @@
 (defun sourcep (sid)
   (%al:is-source sid))
 
-(defun source (param value1 value2 value3)
-  (%al:listener-3f param value1 value2 value3))
+(defun source (sid param value)
+  (cond ((and (or (listp value)
+                  (vectorp value))
+              (= 3 (length value))
+              (every #'numberp value))
+         (%al:source-3f sid param (float (elt value 0) 1.0)
+                        (float (elt value 1) 1.0) (float (elt value 2) 1.0)))
+        ((integerp value)
+         (%al:source-i sid param value))
+        ((floatp value)
+         (%al:source-f sid param value))
+        (t
+         (%al:source-i sid param (if value
+                                     1 0)))))
+
 (defun get-source (sid param)
   (cffi:with-foreign-object (source-array :float 3)
     (%al:get-source-fv sid param source-array)
@@ -123,8 +136,21 @@
 (defun bufferp (buffer-id)
   (%al:is-buffer buffer-id))
 
-(defun buffer (bid param value1 value2 value3)
-  (%al:buffer-3f bid param value1 value2 value3))
+(defun buffer (bid param value)
+  (cond ((and (or (listp value)
+                  (vectorp value))
+              (= 3 (length value))
+              (every #'numberp value))
+         (%al:buffer-3f bid param (float (elt value 0) 1.0)
+                        (float (elt value 1) 1.0) (float (elt value 2) 1.0)))
+        ((integerp value)
+         (%al:buffer-i bid param value))
+        ((floatp value)
+         (%al:buffer-f bid param value))
+        (t
+         (%al:buffer-i bid param (if value
+                                     1 0)))))
+
 (defun get-buffer (bid param)
   (cffi:with-foreign-object (buffer-array :float 3)
     (%al:get-buffer-fv bid param buffer-array)
