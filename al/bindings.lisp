@@ -97,11 +97,7 @@
   (:max-distance #x1023)
 
   ;; Sound sample frequency
-  (:frequency #x2001)
-  (:bits #x2002)
-  (:channels #x2003)
-  (:size #x2004)
-
+  
   ;; Buffer state
   (:unused #x2010)
   (:pending #x2011)
@@ -134,6 +130,12 @@
   (:linear-distance-clamped #xD004)
   (:exponent-distance #xD005)
   (:exponent-distance-clamped #xD006))
+
+(defcenum format
+  (:frequency #x2001)
+  (:bits #x2002)
+  (:channels #x2003)
+  (:size #x2004))
 
 
 ;; Renderer State management
@@ -244,7 +246,7 @@
 (defcfun ("alIsBuffer" is-buffer) :boolean (bid :uint))
 
 (defcfun ("alBufferData" buffer-data) :void 
-  (bid :uint) (format enum) (data :pointer) (size :int) (freq :int))
+  (bid :uint) (format format) (data :pointer) (size :uint) (freq :int))
 
 ;; Set Buffer parameters
 (defcfun ("alBufferf" buffer-f) :void (bid :uint) (param enum) (value :float))
