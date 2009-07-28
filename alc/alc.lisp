@@ -82,9 +82,10 @@
 ;;; Helper macros to keep the world tidy.
 ;;;
 
-(defmacro with-open-device ((var &key (device-name nil)) &body body)
+(defmacro with-device ((var &key (device-name nil)) &body body)
   `(let ((,var (open-device ,device-name)))
      (unwind-protect
 	  (progn
 	    ,@body)
        (when ,var (close-device ,var)))))
+
