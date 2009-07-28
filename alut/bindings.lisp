@@ -106,13 +106,13 @@
 (defcfun ("alutCreateBufferWaveform" create-buffer-waveform) :uint
   (waveshape waveform) (frequency ensure-float) (phase ensure-float) (duration ensure-float))
 
-(defcfun ("alutLoadMemoryFromFile" load-memory-from-file) :void
+(defcfun ("alutLoadMemoryFromFile" load-memory-from-file) :pointer
   (filename pathname-string) (format :pointer) (size :pointer) (frequency :pointer))
-(defcfun ("alutLoadMemoryFromFileImage" load-memory-from-file-image) :void
+(defcfun ("alutLoadMemoryFromFileImage" load-memory-from-file-image) :pointer
   (data (:pointer :void)) (length :int) (format :pointer) (size :pointer) (frequency :pointer))
-(defcfun ("alutLoadMemoryHelloWorld" load-memory-hello-world) :void
+(defcfun ("alutLoadMemoryHelloWorld" load-memory-hello-world) :pointer
   (format :pointer) (size :pointer) (frequency :pointer))
-(defcfun ("alutLoadMemoryWaveform" load-memory-waveform) :void
+(defcfun ("alutLoadMemoryWaveform" load-memory-waveform) :pointer
   (waveshape waveform) (frequency :float) (phase :float) (duration :float)
   (format :pointer) (size :pointer) (freq :pointer))
 
