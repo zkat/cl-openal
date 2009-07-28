@@ -77,3 +77,14 @@
            do (setf (cffi:mem-aref buffer i)
                     (elt samples i)))
       (%alc:capture-samples device buffer n-samples))))
+
+;;;
+;;; Helper macros to keep the world tidy.
+;;;
+
+(defmacro with-open-device ((var &key (device-name nil)) &body body)
+  `(let ((,var (open-device ,device-name)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (close-device ,var)))))
