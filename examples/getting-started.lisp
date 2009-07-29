@@ -30,12 +30,13 @@
 	    ;; Link source to buffer, and place
 	    ;; source at (1 1 1).
 	    (al:source source :buffer buffer)
-	    (al:source source :position (list 1 1 1))
-	    (al:source source :velocity (list 0 0 0))
+	    (al:source source :position #(1 1 1))
+	    (al:source source :velocity #(0 0 0))
 	    ;; Place listener at (1 1 1), and have it
 	    ;; face (0 0 0).
-	    (al:listener :position (list 1 1 1))
-	    (al:listener :orientation (list 0 0 0))
+	    (al:listener :position #(1 1 1))
+	    (al:listener :orientation #(0 0 0
+					0 0 0))
 	    ;; Let the music play...
 	    (al:source source :looping :true)
 	    (al:source-play source)
