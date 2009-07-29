@@ -191,3 +191,36 @@
   (%al:speed-of-sound value))
 (defun distance-model (model-param)
   (%al:distance-model model-param))
+
+
+;;;
+;;; Helper macros to keep the world tidy.
+;;;
+
+(defmacro with-source ((var) &body body)
+  `(let ((,var (gen-source)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (delete-source ,var)))))
+
+(defmacro with-sources ((n var) &body body)
+  `(let ((,var (gen-sources ,n)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (delete-sources ,var)))))
+
+(defmacro with-buffer ((var) &body body)
+  `(let ((,var (gen-buffer)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (delete-buffer ,var)))))
+
+(defmacro with-buffers ((n var) &body body)
+  `(let ((,var (gen-buffers ,n)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (delete-buffers ,var)))))
