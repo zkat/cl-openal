@@ -89,3 +89,6 @@
 	    ,@body)
        (when ,var (close-device ,var)))))
 
+(defmacro with-context ((device &rest attributes) &body body)
+  ;; bind created context to gensym'd var and free it if possible
+)
