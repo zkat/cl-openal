@@ -6,6 +6,7 @@
 ;;;
 ;;; (LESSON2) will use about 25 seconds of your time.
 ;;;
+(in-package #:cl-openal-examples)
 
 (defun init-source-data (sourcepos sourcevel)
   (let ((buffer (al:gen-buffer))
