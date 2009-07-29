@@ -39,8 +39,10 @@
        (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
     ((:orientation)
        (assert (= 6 (length value)))
-       (%al:listener-fv param (elt value)
-			))
+       (cffi:with-foreign-object (array :float 6)
+	 (loop for i below 6
+	       doing (setf (cffi:mem-aref array :float i) (elt value i))
+	       finally (%al:listener-fv param array))))
     ((:gain)
        (%al:listener-f param value))))
 
@@ -50,7 +52,7 @@
        (cffi:with-foreign-object (listener-array :float 6)
 	 (%al:get-listener-fv param listener-array)
 	 (loop for i below 6
-	       collect (cffi:mem-aref listener-array :float i))))
+	       collecting (cffi:mem-aref listener-array :float i))))
     ((:position :velocity)
        (cffi:with-foreign-object (listener-array :float 3)
 	 (%al:get-listener-fv param listener-array)
