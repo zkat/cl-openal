@@ -1,4 +1,4 @@
-OpenAL Programming Guide says that buffers can not be destroyed
+(OpenAL Programming Guide says that buffers can not be destroyed
 while they are queued. Sources, on the other hand, can be destroyed
 while buffers are queued on them.
 
