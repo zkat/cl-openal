@@ -82,13 +82,19 @@
 ;;; Helper macros to keep the world tidy.
 ;;;
 
-(defmacro with-device ((var &key (device-name nil)) &body body)
+(defmacro with-capture-device ((var device-name frequency
+				    format buffer-size) &body body)
+  `(let ((,var (capture-open-device ,device-name ,frequency
+				    ,format ,buffer-size)))
+     (unwind-protect
+	  (progn
+	    ,@body)
+       (when ,var (capture-close-device ,var)))))
+
+(defmacro with-device ((var &optional (device-name nil)) &body body)
   `(let ((,var (open-device ,device-name)))
      (unwind-protect
 	  (progn
 	    ,@body)
        (when ,var (close-device ,var)))))
 
-(defmacro with-context ((device &rest attributes) &body body)
-  ;; bind created context to gensym'd var and free it if possible
-)
