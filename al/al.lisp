@@ -197,30 +197,36 @@
 ;;; Helper macros to keep the world tidy.
 ;;;
 
-(defmacro with-source ((var) &body body)
-  `(let ((,var (gen-source)))
-     (unwind-protect
-	  (progn
-	    ,@body)
-       (when ,var (delete-source ,var)))))
+(define-condition openal-error (condition) ())
 
 (defmacro with-sources ((n var) &body body)
   `(let ((,var (gen-sources ,n)))
      (unwind-protect
 	  (progn
 	    ,@body)
-       (when ,var (delete-sources ,var)))))
+       (when ,var (delete-sources ,var)
+	     (when (not (eq (get-error)
+			    :no-error))
+	       ;; This is mostly for catching :INVALID-OPERATION
+	       ;; which occurs if trying to delete sources with
+	       ;; no current context.
+	       (signal 'openal-error))))))
 
-(defmacro with-buffer ((var) &body body)
-  `(let ((,var (gen-buffer)))
-     (unwind-protect
-	  (progn
-	    ,@body)
-       (when ,var (delete-buffer ,var)))))
+(defmacro with-source ((var) &body body)
+  `(with-sources (1 ,var) ,@body))
 
 (defmacro with-buffers ((n var) &body body)
   `(let ((,var (gen-buffers ,n)))
      (unwind-protect
 	  (progn
 	    ,@body)
-       (when ,var (delete-buffers ,var)))))
+       (when ,var (delete-buffers ,var)
+	 (when (not (eq (get-error)
+			 :no-error))
+	   ;; This is mostly for catching :INVALID-OPERATION
+	   ;; which occurs if trying to delete buffers that
+	   ;; are in use.
+	   (signal 'openal-error))))))
+
+(defmacro with-buffer ((var) &body body)
+  `(with-buffers (1 ,var) ,@body))
