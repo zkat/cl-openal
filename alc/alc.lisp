@@ -104,6 +104,6 @@
 	  (progn
 	    ,@body)
        (when ,var
-	 (when (pointer-eq ,var (get-current-context))
+	 (when (cffi:pointer-eq ,var (get-current-context))
 	   (make-context-current (cffi:null-pointer)))
 	 (destroy-context ,var)))))
