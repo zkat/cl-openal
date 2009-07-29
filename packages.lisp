@@ -30,7 +30,8 @@
    :init :init-without-context :exit :get-error :get-error-string :create-buffer-from-file
    :create-buffer-from-file-image :create-buffer-hello-world :create-buffer-waveform
    :load-memory-from-file :load-memory-from-file-image :load-memory-hello-world :load-memory-waveform
-   :get-mime-types :get-major-version :get-minor-version :sleep))
+   :get-mime-types :get-major-version :get-minor-version :sleep
+   :with-init))
 
 
 ;;;
