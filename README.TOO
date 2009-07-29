@@ -16,14 +16,3 @@ instead of
 
 Same goes for WITH-SOURCES which you want to wrap in WITH-CONTEXT.
 
-
-These macros might also (signal 'openal-error) in case there is
-an error with destruction.
-
-
-
-should signal be exported?
-
-cl-magellan    cube-demo     record path.
-                             preset path.
-                             click to add more sources.
