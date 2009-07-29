@@ -7,8 +7,12 @@
 (defun getting-started ()
   (let ((data nil))
     (alut:with-init
-	;; Init alut so LOAD-MEMORY-HELLO-WORLD works.
-	(setf data (alut:load-memory-hello-world)))
+      ;; Init alut so LOAD-MEMORY-HELLO-WORLD works.
+      ;; But leave alut so we can grab the device using
+      ;; WITH-DEVICE.
+      ;; (setf data (alut:load-memory-from-file "bleep.wav")
+      ;; is a fun alternative!
+      (setf data (alut:load-memory-hello-world)))
     (alc:with-device (device)
       ;; Here it is appropriate to check so
       ;; device is actually opened. GET-ERROR
@@ -27,7 +31,7 @@
 	    ;; source at (1 1 1).
 	    (al:source source :buffer buffer)
 	    (al:source source :position (list 1 1 1))
-	    (al:source source :velocity (list 5 5 0))
+	    (al:source source :velocity (list 0 0 0))
 	    ;; Place listener at (1 1 1), and have it
 	    ;; face (0 0 0).
 	    (al:listener :position (list 1 1 1))
