@@ -9,7 +9,7 @@
    :get-proc-address :get-enum-value :listener :get-listener :gen-sources :gen-source :delete-sources
    :delete-source :sourcep :source :get-source :source-play :source-stop :source-rewind :source-pause
    :source-queue-buffers :source-unqueue-buffers :gen-buffers :gen-buffer :delete-buffers :delete-buffer
-   :bufferp :buffer :get-buffer :doppler-factor :doppler-velocity :speed-of-sound :distance-model :buffer-data))
+   :bufferp :buffer :get-buffer :doppler-factor :doppler-velocity :speed-of-sound :distance-model :buffer-data :with-source :with-sources :with-buffer :with-buffers))
 
 (defpackage #:cl-openal-alc
   (:use :cl)
@@ -18,7 +18,8 @@
    :open-device :close-device :create-context :make-context-current :process-context :suspend-context
    :destroy-context :get-current-context :get-contexts-device :get-error :extension-present-p
    :get-proc-address :get-enum-value :get-string :get-integer :capture-open-device 
-   :capture-close-device :capture-start :capture-stop :capture-samples))
+   :capture-close-device :capture-start :capture-stop :capture-samples
+   :with-device :with-capture-device :with-context))
 
 
 (defpackage #:cl-openal-alut
