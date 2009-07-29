@@ -246,7 +246,7 @@
 (defcfun ("alIsBuffer" is-buffer) :boolean (bid :uint))
 
 (defcfun ("alBufferData" buffer-data) :void 
-  (bid :uint) (format format) (data :pointer) (size :uint) (freq :int))
+  (bid :uint) (format enum) (data :pointer) (size :uint) (freq :int))
 
 ;; Set Buffer parameters
 (defcfun ("alBufferf" buffer-f) :void (bid :uint) (param enum) (value :float))
