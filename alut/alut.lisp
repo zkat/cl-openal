@@ -39,14 +39,15 @@
   (let ((format (cffi:foreign-alloc '%al:enum))
         (size (cffi:foreign-alloc :int))
         (frequency (cffi:foreign-alloc '%al:ensure-float)))
-    (values
+    (values-list
+     (cons
       (%alut:load-memory-from-file filename format size frequency)
       (handler-case
 	  (list (cffi:mem-ref format '%al:enum)
 		(cffi:mem-ref size :int)
 		(cffi:mem-ref frequency '%al:ensure-float))
 	(error ()
-	  (error "There was an error loading ~A" filename))))))
+	  (error "There was an error loading ~A" filename)))))))
 
 (defun load-memory-from-file-image (data)
   (let ((length (length data))
@@ -57,40 +58,43 @@
       (loop for i below length
          do (setf (cffi:mem-aref data-array :int i)
                   (elt data i)))
-      (values
+      (values-list
+       (cons
 	(%alut:load-memory-from-file-image data-array length format size frequency)
 	(handler-case
 	    (list (cffi:mem-ref format '%al:enum)
 		  (cffi:mem-ref size :int)
 		  (cffi:mem-ref frequency '%al::ensure-float))
 	  (error ()
-	    (error "There was an error loading data")))))))
+	    (error "There was an error loading data"))))))))
 
 (defun load-memory-hello-world ()
   (let ((format (cffi:foreign-alloc '%al:enum))
         (size (cffi:foreign-alloc :int))
         (frequency (cffi:foreign-alloc '%al::ensure-float)))
-    (values
+    (values-list
+     (cons
       (%alut:load-memory-hello-world format size frequency)
       (handler-case
 	  (list (cffi:mem-ref format '%al:enum)
 		(cffi:mem-ref size :int)
 		(cffi:mem-ref frequency '%al::ensure-float))
 	(error ()
-	  (error "There was an error loading memory!"))))))
+	  (error "There was an error loading memory!")))))))
 
 (defun load-memory-waveform (waveshape frequency phase duration)
   (let ((format (cffi:foreign-alloc '%al:enum))
         (size (cffi:foreign-alloc :int))
         (freq (cffi:foreign-alloc '%al::ensure-float)))
-    (values
+    (values-list
+     (cons
       (%alut:load-memory-waveform waveshape frequency phase duration format size freq)
       (handler-case
 	  (list (cffi:mem-ref format '%al:enum)
 		(cffi:mem-ref size :int)
 		(cffi:mem-ref freq '%al::ensure-float))
 	(error ()
-	  (error "There was an error loading this waveform"))))))
+	  (error "There was an error loading this waveform")))))))
 
 ;;;
 ;;; Misc
