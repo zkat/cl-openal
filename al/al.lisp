@@ -34,17 +34,28 @@
 ;;;
 (defun listener (param value)
   (ecase param
-    ((:position :velocity :orientation)
-     (assert (= 3 (length value)))
-     (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
+    ((:position :velocity)
+       (assert (= 3 (length value)))
+       (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
+    ((:orientation)
+       (assert (= 6 (length value)))
+       (%al:listener-fv param (elt value)
+			))
     ((:gain)
-     (%al:listener-f param value))))
+       (%al:listener-f param value))))
 
 (defun get-listener (param)
-  (cffi:with-foreign-object (listener-array :float 3)
-    (%al:get-listener-fv param listener-array)
-    (loop for i below 3
-         collect (cffi:mem-aref listener-array :float i))))
+  (ecase param
+    ((:orientation)
+       (cffi:with-foreign-object (listener-array :float 6)
+	 (%al:get-listener-fv param listener-array)
+	 (loop for i below 6
+	       collect (cffi:mem-aref listener-array :float i))))
+    ((:position :velocity)
+       (cffi:with-foreign-object (listener-array :float 3)
+	 (%al:get-listener-fv param listener-array)
+	 (loop for i below 3
+	       collect (cffi:mem-aref listener-array :float i))))))
 
 ;;;
 ;;; Sources
