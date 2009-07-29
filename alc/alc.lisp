@@ -103,4 +103,8 @@
      (unwind-protect
 	  (progn
 	    ,@body)
-       (when ,var (destroy-context ,var)))))
+       (when ,var
+	 (when (= (cffi:pointer-address ,var) 
+		  (cffi:pointer-address (get-current-context)))
+	   (make-context-current (cffi:null-pointer)))
+	 (destroy-context ,var)))))
