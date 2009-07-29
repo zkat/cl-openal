@@ -41,7 +41,8 @@
        (assert (= 6 (length value)))
        (cffi:with-foreign-object (array :float 6)
 	 (loop for i below 6
-	       doing (setf (cffi:mem-aref array :float i) (elt value i))
+	       doing (setf (cffi:mem-aref array :float i) 
+			   (coerce (elt value i) 'float))
 	       finally (%al:listener-fv param array))))
     ((:gain)
        (%al:listener-f param value))))
