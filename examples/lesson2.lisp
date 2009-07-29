@@ -1,7 +1,7 @@
 ;;;
 ;;; Lesson 2 - Looping and fadeaway
 ;;;
-;;; Common Lisp adaption of
+;;; Common Lisp adaptation of
 ;;; http://www.devmaster.net/articles/openal-tutorials/lesson2.php
 ;;;
 ;;; (LESSON2) will use about 25 seconds of your time.
@@ -42,5 +42,5 @@
 	    (dotimes (i 250)
 	      (sleep 0.1)
 	      (setf sourcepos (map 'vector #'+ sourcepos sourcevel))
-	      (al:source source :position sourcepos))))))
+	      (al:source source :position sourcepos)))))) ; Move source.
 
