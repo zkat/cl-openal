@@ -11,4 +11,5 @@
     :components
     ((:file "examples")
      (:file "alut-hello-world")
-     (:file "getting-started")))))
+     (:file "getting-started")
+     (:file "lesson2.lisp")))))
