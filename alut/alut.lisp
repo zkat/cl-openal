@@ -106,3 +106,12 @@
 (defun sleep (duration)
   (%alut:sleep duration))
 
+;;;
+;;; Helper macros to keep the world clean.
+;;;
+
+(defmacro with-init (&body body)
+  `(unwind-protect
+	(progn
+	  ,@body)
+     (alut:exit)))
