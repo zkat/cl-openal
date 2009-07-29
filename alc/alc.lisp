@@ -99,7 +99,9 @@
        (when ,var (close-device ,var)))))
 
 (defmacro with-context ((var device &rest attributes) &body body)
-  `(let ((,var (create-context ,device ,attributes)))
+  `(let ((,var ,(if attributes 
+		    `(create-context ,device ,@attributes)
+		    `(create-context ,device))))
      (unwind-protect
 	  (progn
 	    ,@body)
