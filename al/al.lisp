@@ -166,12 +166,7 @@
   (%al:buffer-i bid param value))
 
 (defun buffer-data (bid format data size freq)
-  (let ((len (length data)))
-    (cffi:with-foreign-object (data-array :int len)
-      (loop for i below len
-           do (setf (cffi:mem-aref data-array i)
-                    (elt data i)))
-      (%al:buffer-data bid format data-array size freq))))
+  (%al:buffer-data bid format data size freq))
 
 (defun get-buffer (bid param)
   (let* ((ptr (cffi:foreign-alloc :int))
