@@ -10,4 +10,5 @@
   ((:module "examples"
     :components
     ((:file "examples")
-     (:file "alut-hello-world")))))
+     (:file "alut-hello-world")
+     (:file "getting-started")))))
