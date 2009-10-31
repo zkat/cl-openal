@@ -39,10 +39,10 @@
     ((:orientation)
        (assert (= 6 (length value)))
        (cffi:with-foreign-object (array :float 6)
-	 (loop for i below 6
-	       doing (setf (cffi:mem-aref array :float i) 
-			   (coerce (elt value i) 'float))
-	       finally (%al:listener-fv param array))))
+         (loop for i below 6
+               doing (setf (cffi:mem-aref array :float i)
+                           (coerce (elt value i) 'float))
+               finally (%al:listener-fv param array))))
     ((:gain)
        (%al:listener-f param value))))
 
@@ -50,14 +50,14 @@
   (ecase param
     ((:orientation)
        (cffi:with-foreign-object (listener-array :float 6)
-	 (%al:get-listener-fv param listener-array)
-	 (loop for i below 6
-	       collecting (cffi:mem-aref listener-array :float i))))
+         (%al:get-listener-fv param listener-array)
+         (loop for i below 6
+               collecting (cffi:mem-aref listener-array :float i))))
     ((:position :velocity)
        (cffi:with-foreign-object (listener-array :float 3)
-	 (%al:get-listener-fv param listener-array)
-	 (loop for i below 3
-	       collect (cffi:mem-aref listener-array :float i))))))
+         (%al:get-listener-fv param listener-array)
+         (loop for i below 3
+               collect (cffi:mem-aref listener-array :float i))))))
 
 ;;;
 ;;; Sources
@@ -71,7 +71,7 @@
   (let ((n (length sources)))
    (cffi:with-foreign-object (source-array :uint n)
      (loop for i below n
-        do (setf 
+        do (setf
             (cffi:mem-aref source-array :uint i)
             (elt sources i)))
      (%al:delete-sources n source-array))))
@@ -102,20 +102,20 @@
       :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
       :sample-offset :byte-offset)
      (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn 
+            (val (progn
                    (%al:get-source-f sid param ptr)
                    (cffi:mem-ref ptr :int))))
        val))
     ((:looping :source-relative)
      (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn 
+            (val (progn
                    (%al:get-source-i sid param ptr)
                    (cffi:mem-ref ptr :int))))
        (if (> val 0)
            t nil)))
     ((:source-type :buffer :buffers-queued :buffers-processed)
      (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn 
+            (val (progn
                    (%al:get-source-i sid param ptr)
                    (cffi:mem-ref ptr :int))))
        val))
@@ -169,7 +169,7 @@
   (let ((n (length buffers)))
    (cffi:with-foreign-object (buffer-array :uint n)
      (loop for i below n
-        do (setf 
+        do (setf
             (cffi:mem-aref buffer-array :uint i)
             (elt buffers i)))
      (%al:delete-buffers n buffer-array))))
@@ -189,7 +189,7 @@
 
 (defun get-buffer (bid param)
   (let* ((ptr (cffi:foreign-alloc :int))
-         (val (progn 
+         (val (progn
                 (%al:get-buffer-i bid param ptr)
                 (cffi:mem-ref ptr :int))))
     val))
@@ -214,27 +214,27 @@
 (defmacro with-sources ((n var) &body body)
   `(let ((,var (gen-sources ,n)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (delete-sources ,var)))))
 
 (defmacro with-source ((var) &body body)
   `(let ((,var (gen-source)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (delete-source ,var)))))
 
 (defmacro with-buffers ((n var) &body body)
   `(let ((,var (gen-buffers ,n)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (delete-buffers ,var)))))
 
 (defmacro with-buffer ((var) &body body)
   `(let ((,var (gen-buffer)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (delete-buffer ,var)))))
