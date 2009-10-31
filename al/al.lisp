@@ -9,7 +9,6 @@
   (%al:is-enabled capability))
 
 ;; State retrieval
-;; TODO: do I actually need all of these?...
 (defun get-string (param)
   (%al:get-string param))
 (defun get-boolean (param)

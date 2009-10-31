@@ -40,6 +40,7 @@
 (defpackage #:openal-cffi-bindings
   (:use :cl :cffi)
   (:nicknames :%al)
+  (:shadow :boolean :byte)
   (:export
    :enum :boolean :byte :ubyte :ensure-float :ensure-integer :ensure-double
    ;; renderer state management
@@ -84,6 +85,7 @@
 (defpackage #:alc-cffi-bindings
   (:use :cl :cffi)
   (:nicknames :%alc)
+  (:shadow :boolean)
   (:export
    :attribute :error :enum :device :context :boolean 
    ;; Context management
