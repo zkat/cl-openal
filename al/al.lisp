@@ -113,12 +113,18 @@
                    (cffi:mem-ref ptr :int))))
        (if (> val 0)
            t nil)))
-    ((:source-type :buffer :buffers-queued :buffers-processed :source-state)
+    ((:source-type :buffer :buffers-queued :buffers-processed)
      (let* ((ptr (cffi:foreign-alloc :int))
             (val (progn 
                    (%al:get-source-i sid param ptr)
                    (cffi:mem-ref ptr :int))))
        val))
+    (:source-state
+     (let* ((ptr (cffi:foreign-alloc :int))
+            (val (progn
+                   (%al:get-source-i sid param ptr)
+                   (cffi:mem-ref ptr :int))))
+       (cffi:foreign-enum-keyword '%al:enum val)))
     ((:position :velocity :direction)
      (cffi:with-foreign-object (source-array :float 3)
        (%al:get-source-fv sid param source-array)
