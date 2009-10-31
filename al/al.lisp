@@ -114,7 +114,7 @@
                    (cffi:mem-ref ptr :int))))
        (if (> val 0)
            t nil)))
-    ((:source-type :buffer :buffers-queued :buffers-processed)
+    ((:source-type :buffer :buffers-queued :buffers-processed :source-state)
      (let* ((ptr (cffi:foreign-alloc :int))
             (val (progn 
                    (%al:get-source-i sid param ptr)
