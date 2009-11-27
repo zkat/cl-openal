@@ -149,13 +149,14 @@
          do (setf (cffi:mem-aref buffer-array :uint i)
                   (elt buffers i)))
       (%al:source-queue-buffers sid n buffer-array))))
-(defun source-unqueue-buffers (sid buffers)
-  (let ((n (length buffers)))
-    (cffi:with-foreign-object (buffer-array :uint n)
-      (loop for i below n
-         do (setf (cffi:mem-aref buffer-array :uint i)
-                  (elt buffers i)))
-      (%al:source-unqueue-buffers sid n buffer-array))))
+
+(defun source-unqueue-buffers (sid num-buffers)
+  (cffi:with-foreign-object (buffer-array :uint)
+    (setf (cffi:mem-ref buffer-array :uint) 0)
+    (%al:source-unqueue-buffers sid num-buffers buffer-array)
+    (unless (zerop (cffi:mem-ref buffer-array :uint))
+      (loop for i below num-buffers
+         collect (cffi:mem-aref buffer-array :uint i)))))
 
 ;;;
 ;;; Buffers
