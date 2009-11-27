@@ -150,7 +150,7 @@
                   (elt buffers i)))
       (%al:source-queue-buffers sid n buffer-array))))
 
-(defun source-unqueue-buffers (sid num-buffers)
+(defun source-unqueue-buffers (sid &optional (num-buffers 1))
   (cffi:with-foreign-object (buffer-array :uint)
     (setf (cffi:mem-ref buffer-array :uint) 0)
     (%al:source-unqueue-buffers sid num-buffers buffer-array)
