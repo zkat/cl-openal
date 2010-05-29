@@ -8,8 +8,9 @@
   :depends-on (cffi cl-openal)
   :components
   ((:module "examples"
+    :serial t
     :components
     ((:file "examples")
      (:file "alut-hello-world")
      (:file "getting-started")
-     (:file "lesson2.lisp")))))
+     (:file "lesson2")))))
