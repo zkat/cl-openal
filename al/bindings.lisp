@@ -1,6 +1,7 @@
 (in-package :%al)
 
 (define-foreign-library al
+  (:windows "OpenAL32.dll" :calling-convention :stdcall)
   (:unix (:or "libopenal" "libopenal.so.1"))
   (t (:default "libopenal")))
 (use-foreign-library al)
