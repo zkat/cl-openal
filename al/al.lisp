@@ -1,5 +1,14 @@
 (in-package :al)
 
+;;;; misc.
+(defun load-libraries ()
+  (cffi:define-foreign-library al
+      (:windows "OpenAL32.dll" :calling-convention :stdcall)
+    (:unix (:or "libopenal" "libopenal.so.1"))
+    (t (:default "libopenal")))
+  (cffi:use-foreign-library al))
+
+
 ;; Renderer State management
 (defun enable (capability)
   (%al:enable capability))

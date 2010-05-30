@@ -1,5 +1,12 @@
 (in-package :alc)
 
+(defun load-libraries ()
+  (cffi:define-foreign-library al
+      (:windows "OpenAL32.dll" :calling-convention :stdcall)
+    (:unix (:or "libopenal" "libopenal.so.1"))
+    (t (:default "libopenal")))
+  (cffi:use-foreign-library al))
+
 (defun open-device (&optional device-name)
   (let ((foreign-dev (%alc:open-device (or device-name
                                            (cffi:null-pointer)))))

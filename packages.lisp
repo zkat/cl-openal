@@ -5,6 +5,7 @@
   (:use :cl)
   (:nicknames :al)
   (:export
+   #:load-libraries
    :enable :disable :enabledp :get-string :get-boolean :get-integer :get-error :extension-present-p
    :get-proc-address :get-enum-value :listener :get-listener :gen-sources :gen-source :delete-sources
    :delete-source :sourcep :source :get-source :source-play :source-stop :source-rewind :source-pause
@@ -15,6 +16,7 @@
   (:use :cl)
   (:nicknames :alc)
   (:export
+   #:load-libraries
    :open-device :close-device :create-context :make-context-current :process-context :suspend-context
    :destroy-context :get-current-context :get-contexts-device :get-error :extension-present-p
    :get-proc-address :get-enum-value :get-string :get-integer :capture-open-device 
@@ -27,6 +29,7 @@
   (:nicknames :alut)
   (:shadow :sleep)
   (:export
+   #:load-libraries
    :init :init-without-context :exit :get-error :get-error-string :create-buffer-from-file
    :create-buffer-from-file-image :create-buffer-hello-world :create-buffer-waveform
    :load-memory-from-file :load-memory-from-file-image :load-memory-hello-world :load-memory-waveform
