@@ -4,7 +4,7 @@
 (defun load-libraries ()
   (cffi:define-foreign-library al
       (:windows "OpenAL32.dll" :calling-convention :stdcall)
-    (:unix (:or "libopenal" "libopenal.so.1"))
+    (:unix (:or "libopenal.so" "libopenal.so.1"))
     (t (:default "libopenal")))
   (cffi:use-foreign-library al))
 
