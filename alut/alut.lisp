@@ -3,7 +3,7 @@
 (defun load-libraries ()
   (cffi:define-foreign-library alut
       (:windows "alut.dll" :calling-convention :stdcall)
-    (:unix (:or "libalut" "libalut.so.0" "libalut.so.0.1.0"))
+    (:unix (:or "libalut.so" "libalut.so.0" "libalut.so.0.1.0"))
     (t (:default ("libalut"))))
   (cffi:use-foreign-library alut))
 
