@@ -2,7 +2,7 @@
 
 (defun load-libraries ()
   (cffi:define-foreign-library alut
-      (:windows "alut.dll" :calling-convention :stdcall)
+    (:windows "alut.dll" :calling-convention :stdcall)
     (:unix (:or "libalut.so" "libalut.so.0" "libalut.so.0.1.0"))
     (t (:default ("libalut"))))
   (cffi:use-foreign-library alut))
@@ -50,11 +50,11 @@
      (cons
       (%alut:load-memory-from-file filename format size frequency)
       (handler-case
-	  (list (cffi:mem-ref format '%al:enum)
-		(cffi:mem-ref size :int)
-		(cffi:mem-ref frequency '%al:ensure-float))
-	(error ()
-	  (error "There was an error loading ~A" filename)))))))
+          (list (cffi:mem-ref format '%al:enum)
+                (cffi:mem-ref size :int)
+                (cffi:mem-ref frequency '%al:ensure-float))
+        (error ()
+          (error "There was an error loading ~A" filename)))))))
 
 (defun load-memory-from-file-image (data)
   (let ((length (length data))
@@ -67,13 +67,13 @@
                   (elt data i)))
       (values-list
        (cons
-	(%alut:load-memory-from-file-image data-array length format size frequency)
-	(handler-case
-	    (list (cffi:mem-ref format '%al:enum)
-		  (cffi:mem-ref size :int)
-		  (cffi:mem-ref frequency '%al::ensure-float))
-	  (error ()
-	    (error "There was an error loading data"))))))))
+        (%alut:load-memory-from-file-image data-array length format size frequency)
+        (handler-case
+            (list (cffi:mem-ref format '%al:enum)
+                  (cffi:mem-ref size :int)
+                  (cffi:mem-ref frequency '%al::ensure-float))
+          (error ()
+            (error "There was an error loading data"))))))))
 
 (defun load-memory-hello-world ()
   (let ((format (cffi:foreign-alloc '%al:enum))
@@ -83,11 +83,11 @@
      (cons
       (%alut:load-memory-hello-world format size frequency)
       (handler-case
-	  (list (cffi:mem-ref format '%al:enum)
-		(cffi:mem-ref size :int)
-		(cffi:mem-ref frequency '%al::ensure-float))
-	(error ()
-	  (error "There was an error loading memory!")))))))
+          (list (cffi:mem-ref format '%al:enum)
+                (cffi:mem-ref size :int)
+                (cffi:mem-ref frequency '%al::ensure-float))
+        (error ()
+          (error "There was an error loading memory!")))))))
 
 (defun load-memory-waveform (waveshape frequency phase duration)
   (let ((format (cffi:foreign-alloc '%al:enum))
@@ -97,11 +97,11 @@
      (cons
       (%alut:load-memory-waveform waveshape frequency phase duration format size freq)
       (handler-case
-	  (list (cffi:mem-ref format '%al:enum)
-		(cffi:mem-ref size :int)
-		(cffi:mem-ref freq '%al::ensure-float))
-	(error ()
-	  (error "There was an error loading this waveform")))))))
+          (list (cffi:mem-ref format '%al:enum)
+                (cffi:mem-ref size :int)
+                (cffi:mem-ref freq '%al::ensure-float))
+        (error ()
+          (error "There was an error loading this waveform")))))))
 
 ;;;
 ;;; Misc
@@ -123,7 +123,7 @@
 
 (defmacro with-init (&body body)
   `(unwind-protect
-	(init)
-	(progn
-	  ,@body)
+        (init)
+     (progn
+       ,@body)
      (alut:exit)))
