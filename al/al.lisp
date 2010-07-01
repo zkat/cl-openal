@@ -3,11 +3,10 @@
 ;;;; misc.
 (defun load-libraries ()
   (cffi:define-foreign-library al
-      (:windows "OpenAL32.dll" :calling-convention :stdcall)
+    (:windows "OpenAL32.dll" :calling-convention :stdcall)
     (:unix (:or "libopenal.so" "libopenal.so.1"))
     (t (:default "libopenal")))
   (cffi:use-foreign-library al))
-
 
 ;; Renderer State management
 (defun enable (capability)
@@ -43,30 +42,30 @@
 (defun listener (param value)
   (ecase param
     ((:position :velocity)
-       (assert (= 3 (length value)))
-       (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
+     (assert (= 3 (length value)))
+     (%al:listener-3f param (elt value 0) (elt value 1) (elt value 2)))
     ((:orientation)
-       (assert (= 6 (length value)))
-       (cffi:with-foreign-object (array :float 6)
-         (loop for i below 6
-               doing (setf (cffi:mem-aref array :float i)
-                           (coerce (elt value i) 'float))
-               finally (%al:listener-fv param array))))
+     (assert (= 6 (length value)))
+     (cffi:with-foreign-object (array :float 6)
+       (loop for i below 6
+          doing (setf (cffi:mem-aref array :float i)
+                      (coerce (elt value i) 'float))
+          finally (%al:listener-fv param array))))
     ((:gain)
-       (%al:listener-f param value))))
+     (%al:listener-f param value))))
 
 (defun get-listener (param)
   (ecase param
     ((:orientation)
-       (cffi:with-foreign-object (listener-array :float 6)
-         (%al:get-listener-fv param listener-array)
-         (loop for i below 6
-               collecting (cffi:mem-aref listener-array :float i))))
+     (cffi:with-foreign-object (listener-array :float 6)
+       (%al:get-listener-fv param listener-array)
+       (loop for i below 6
+          collecting (cffi:mem-aref listener-array :float i))))
     ((:position :velocity)
-       (cffi:with-foreign-object (listener-array :float 3)
-         (%al:get-listener-fv param listener-array)
-         (loop for i below 3
-               collect (cffi:mem-aref listener-array :float i))))))
+     (cffi:with-foreign-object (listener-array :float 3)
+       (%al:get-listener-fv param listener-array)
+       (loop for i below 3
+          collect (cffi:mem-aref listener-array :float i))))))
 
 ;;;
 ;;; Sources
@@ -75,15 +74,15 @@
   (cffi:with-foreign-object (source-array :uint n)
     (%al:gen-sources n source-array)
     (loop for i below n
-         collect (cffi:mem-aref source-array :uint))))
+       collect (cffi:mem-aref source-array :uint))))
 (defun delete-sources (sources)
   (let ((n (length sources)))
-   (cffi:with-foreign-object (source-array :uint n)
-     (loop for i below n
-        do (setf
-            (cffi:mem-aref source-array :uint i)
-            (elt sources i)))
-     (%al:delete-sources n source-array))))
+    (cffi:with-foreign-object (source-array :uint n)
+      (loop for i below n
+         do (setf
+             (cffi:mem-aref source-array :uint i)
+             (elt sources i)))
+      (%al:delete-sources n source-array))))
 (defun gen-source ()
   (car (gen-sources 1)))
 (defun delete-source (sid)
@@ -95,7 +94,7 @@
 (defun source (sid param value)
   (ecase param
     ((:gain :pitch :min-gain :max-gain :reference-distance :rolloff-factor :max-distance
-      :sec-offset :sample-offset :byte-offset :cone-inner-angle :cone-outer-angle :cone-outer-gain)
+            :sec-offset :sample-offset :byte-offset :cone-inner-angle :cone-outer-angle :cone-outer-gain)
      (%al:source-f sid param value))
     ((:looping :source-relative)
      (%al:source-i sid param (if value 1 0)))
@@ -108,8 +107,8 @@
 (defun get-source (sid param)
   (ecase param
     ((:gain :pitch :min-gain :max-gain :reference-distance
-      :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
-      :sample-offset :byte-offset)
+            :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
+            :sample-offset :byte-offset)
      (let* ((ptr (cffi:foreign-alloc :int))
             (val (progn
                    (%al:get-source-f sid param ptr)
@@ -174,15 +173,15 @@
   (cffi:with-foreign-object (buffer-array :uint n)
     (%al:gen-buffers n buffer-array)
     (loop for i below n
-         collect (cffi:mem-aref buffer-array :uint))))
+       collect (cffi:mem-aref buffer-array :uint))))
 (defun delete-buffers (buffers)
   (let ((n (length buffers)))
-   (cffi:with-foreign-object (buffer-array :uint n)
-     (loop for i below n
-        do (setf
-            (cffi:mem-aref buffer-array :uint i)
-            (elt buffers i)))
-     (%al:delete-buffers n buffer-array))))
+    (cffi:with-foreign-object (buffer-array :uint n)
+      (loop for i below n
+         do (setf
+             (cffi:mem-aref buffer-array :uint i)
+             (elt buffers i)))
+      (%al:delete-buffers n buffer-array))))
 (defun gen-buffer ()
   (car (gen-buffers 1)))
 (defun delete-buffer (bid)
