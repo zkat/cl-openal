@@ -5,24 +5,23 @@
   :author "Josh <sykopomp@sykosomatic.org>"
   :licence "public domain"
   :depends-on (cffi)
-  :serial t
   :components
   ((:file "packages")
    (:module al
-            :serial t
+            :depends-on ("packages")
             :components
             ((:file "bindings")
-             (:file "al")))
+             (:file "al" :depends-on ("bindings"))))
    (:module alc
-            :serial t
+            :depends-on ("packages")
             :components
             ((:file "bindings")
-             (:file "alc")))
+             (:file "alc" :depends-on ("bindings"))))
    (:module alut
-            :serial t
+            :depends-on ("packages")
             :components
             ((:file "bindings")
-             (:file "alut")))))
+             (:file "alut" :depends-on ("bindings"))))))
 
 
 
