@@ -1,8 +1,8 @@
 (asdf:defsystem cl-openal
-  :version "0"
-  :description "OpenAL bindings"
-  :maintainer "Kat <kzm@sykosomatic.org>"
-  :author "Kat <kzm@sykosomatic.org>"
+  :version "1.0"
+  :description "CFFI bindings for OpenAL sound system."
+  :maintainer "Kat Marchán <kzm@sykosomatic.org>"
+  :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "public domain"
   :depends-on (cffi)
   :components
