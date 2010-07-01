@@ -70,7 +70,10 @@
             collect (cffi:mem-aref int-list :int i))))))
 
 (defun capture-open-device (device-name frequency format buffer-size)
-  (%alc:capture-open-device device-name (coerce frequency 'int) format (coerce buffer-size 'int)))
+  (%alc:capture-open-device device-name
+                            (coerce frequency 'integer)
+                            format
+                            (coerce buffer-size 'integer)))
 (defun capture-close-device (device)
   (%alc:capture-close-device device))
 (defun capture-start (device)
