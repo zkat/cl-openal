@@ -2,7 +2,7 @@
 
 (defun load-libraries ()
   (cffi:define-foreign-library al
-      (:windows "OpenAL32.dll" :calling-convention :stdcall)
+    (:windows "OpenAL32.dll" :calling-convention :stdcall)
     (:unix (:or "libopenal.so" "libopenal.so.1"))
     (t (:default "libopenal")))
   (cffi:use-foreign-library al))
@@ -64,10 +64,10 @@
   (cffi:with-foreign-object (size-arr :int 1)
     (%alc:get-integer-v device :attributes-size 1 size-arr)
     (let ((size (cffi:mem-aref size-arr :int 0)))
-     (cffi:with-foreign-object (int-list :int size)
-       (%alc:get-integer-v device param size int-list)
-       (loop for i below size
-            collect (cffi:mem-aref int-list :int i))))))
+      (cffi:with-foreign-object (int-list :int size)
+        (%alc:get-integer-v device param size int-list)
+        (loop for i below size
+           collect (cffi:mem-aref int-list :int i))))))
 
 (defun capture-open-device (device-name frequency format buffer-size)
   (%alc:capture-open-device device-name
@@ -84,8 +84,8 @@
   (let ((n-samples (length samples)))
     (cffi:with-foreign-object (buffer :pointer n-samples)
       (loop for i below n-samples
-           do (setf (cffi:mem-aref buffer i)
-                    (elt samples i)))
+         do (setf (cffi:mem-aref buffer i)
+                  (elt samples i)))
       (%alc:capture-samples device buffer n-samples))))
 
 ;;;
@@ -93,29 +93,29 @@
 ;;;
 
 (defmacro with-capture-device ((var device-name frequency
-				    format buffer-size) &body body)
+                                    format buffer-size) &body body)
   `(let ((,var (capture-open-device ,device-name ,frequency
-				    ,format ,buffer-size)))
+                                    ,format ,buffer-size)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (capture-close-device ,var)))))
 
 (defmacro with-device ((var &optional (device-name nil)) &body body)
   `(let ((,var (open-device ,device-name)))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var (close-device ,var)))))
 
 (defmacro with-context ((var device &rest attributes) &body body)
   `(let ((,var ,(if attributes 
-		    `(create-context ,device ,@attributes)
-		    `(create-context ,device))))
+                    `(create-context ,device ,@attributes)
+                    `(create-context ,device))))
      (unwind-protect
-	  (progn
-	    ,@body)
+          (progn
+            ,@body)
        (when ,var
-	 (when (cffi:pointer-eq ,var (get-current-context))
-	   (make-context-current (cffi:null-pointer)))
-	 (destroy-context ,var)))))
+         (when (cffi:pointer-eq ,var (get-current-context))
+           (make-context-current (cffi:null-pointer)))
+         (destroy-context ,var)))))
