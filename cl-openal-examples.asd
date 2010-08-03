@@ -5,7 +5,7 @@
 
 (defsystem cl-openal-examples
   :description "Examples using cl-openal."
-  :depends-on (cffi cl-openal)
+  :depends-on (cffi cl-openal cl-alc cl-alut)
   :components
   ((:module "examples"
     :serial t
