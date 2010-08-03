@@ -1,13 +1,13 @@
-(asdf:defsystem cl-openal
+(asdf:defsystem cl-alut
   :version "1.0"
-  :description "CFFI bindings for OpenAL sound system."
+  :description "CFFI bindings for OpenAL's ALUT API."
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "public domain"
-  :depends-on (cffi)
+  :depends-on (cffi cl-openal)
   :components
-  ((:module al
+  ((:module alut
             :components
             ((:file "packages")
              (:file "bindings" :depends-on ("packages"))
-             (:file "al" :depends-on ("packages" "bindings"))))))
+             (:file "alut" :depends-on ("packages" "bindings"))))))
