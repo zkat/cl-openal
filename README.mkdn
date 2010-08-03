@@ -1,0 +1,48 @@
+About
+-----
+
+cl-openal is a series of semi-lispy public domain bindings to the OpenAL API. It includes direct
+CFFI bindings, as well as varying levels of lispy wrappings around AL, ALC, and ALUT.
+
+The translation from the C bindings to lispy bindings is pretty straightforward, and follows
+cl-opengl's example, in spirit.
+
+Loading
+-------
+
+cl-openal depends on CFFI to load. It's split into three separate systems: cl-openal for the basic
+OpenAL bindings, cl-alc for ALC, and cl-alut for ALUT. If you need anything from ALC or ALUT, you'll
+have to specifically load them.
+
+In order to use cl-openal and cl-alc, you'll need to have OpenAL installed on your system, or
+available as a shared library/.dll. Additionally, an implementation of ALUT needs to be available in
+order to use cl-alut (such as freealut).
+
+cl-openal should run on all major platforms, including Linux, the BSDs, OSX, and Windows. It should
+be usable by any Common Lisp implementation supported by CFFI.
+
+Support
+-------
+
+If you have any questions, you may contact me at <sykopomp@sykosomatic.org>. Patches or similar
+always welcome!
+
+Extra Notes
+-----------
+
+The OpenAL Programming Guide says that buffers can not be destroyed while they are queued. Sources,
+on the other hand, can be destroyed while buffers are queued on them.
+
+For this reason it's probably a good idea to do:
+
+    (with-buffers ...
+      (with-sources ...
+        (queueing code)))
+
+instead of
+
+    (with-sources ...
+      (with-buffers ...
+        (queueing code)))
+
+Same goes for WITH-SOURCES which you want to wrap in WITH-CONTEXT.
