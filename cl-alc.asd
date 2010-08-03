@@ -1,13 +1,13 @@
-(asdf:defsystem cl-openal
+(asdf:defsystem cl-alc
   :version "1.0"
-  :description "CFFI bindings for OpenAL sound system."
+  :description "CFFI bindings for OpenAL's ALC API."
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "public domain"
-  :depends-on (cffi)
+  :depends-on (cffi cl-openal)
   :components
-  ((:module al
+  ((:module alc
             :components
             ((:file "packages")
              (:file "bindings" :depends-on ("packages"))
-             (:file "al" :depends-on ("packages" "bindings"))))))
+             (:file "alc" :depends-on ("packages" "bindings"))))))
