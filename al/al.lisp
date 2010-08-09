@@ -56,6 +56,12 @@
 
 (defun get-listener (param)
   (ecase param
+    ((:gain)
+     (let* ((ptr (cffi:foreign-alloc :float))
+            (val (progn
+                   (%al:get-listener-f param ptr)
+                   (cffi:mem-ref ptr :float))))
+       val))
     ((:orientation)
      (cffi:with-foreign-object (listener-array :float 6)
        (%al:get-listener-fv param listener-array)
@@ -109,10 +115,10 @@
     ((:gain :pitch :min-gain :max-gain :reference-distance
             :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
             :sample-offset :byte-offset)
-     (let* ((ptr (cffi:foreign-alloc :int))
+     (let* ((ptr (cffi:foreign-alloc :float))
             (val (progn
                    (%al:get-source-f sid param ptr)
-                   (cffi:mem-ref ptr :int))))
+                   (cffi:mem-ref ptr :float))))
        val))
     ((:looping :source-relative)
      (let* ((ptr (cffi:foreign-alloc :int))
