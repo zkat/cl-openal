@@ -2,7 +2,7 @@
 
 (define-foreign-library al
   (:windows "OpenAL32.dll" :calling-convention :stdcall)
-  (:darwin (:or (:framework "openal") (:default "libopenal")))
+  (:darwin (:or (:default "libopenal") (:framework "openal")))
   (:unix (:or "libopenal.so" "libopenal.so.1"))
   (t (:default "libopenal")))
 (use-foreign-library al)
