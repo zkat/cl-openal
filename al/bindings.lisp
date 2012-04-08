@@ -265,7 +265,7 @@
 (defcfun ("alGetBuffer3f" get-buffer-3f) :void
   (bid :uint) (param enum) (value1 :pointer) (value2 :pointer) (value3 :pointer))
 (defcfun ("alGetBufferfv" get-buffer-fv) :void (bid :uint) (param enum) (values :pointer))
-(defcfun ("alGetBufferi" get-buffer-i) :void (bid :uint) (param enum) (value :pointer))
+(defcfun ("alGetBufferi" get-buffer-i) :void (bid :uint) (param format) (value :pointer))
 (defcfun ("alGetBuffer3i" get-buffer-3i) :void 
   (bid :uint) (param enum) (value1 :pointer) (value2 :pointer) (value3 :pointer))
 (defcfun ("alGetBufferiv" get-buffer-iv) :void (bid :uint) (param enum) (values :pointer))
