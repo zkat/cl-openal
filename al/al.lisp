@@ -133,7 +133,7 @@
      (cffi:with-foreign-object (source-array :float 3)
        (%al:get-source-fv sid param source-array)
        (loop for i below 3
-	     collect (cffi:mem-aref source-array :float i))))))
+             collect (cffi:mem-aref source-array :float i))))))
 
 ;; Playback
 (defun source-play (sid)
