@@ -44,65 +44,67 @@
 ;;; Loading memory
 ;;;
 (defun load-memory-from-file (filename)
-  (let ((format (cffi:foreign-alloc '%al:enum))
-        (size (cffi:foreign-alloc :int))
-        (frequency (cffi:foreign-alloc '%al:ensure-float)))
+  (cffi:with-foreign-objects ((format '%al:enum)
+			      (size :int)
+			      (frequency '%al:ensure-float))
     (values-list
      (cons
       (%alut:load-memory-from-file filename format size frequency)
       (handler-case
-          (list (cffi:mem-ref format '%al:enum)
-                (cffi:mem-ref size :int)
-                (cffi:mem-ref frequency '%al:ensure-float))
-        (error ()
-          (error "There was an error loading ~A" filename)))))))
+	  (list (cffi:mem-ref format '%al:enum)
+		(cffi:mem-ref size :int)
+		(cffi:mem-ref frequency '%al:ensure-float))
+	(error ()
+	  (error "There was an error loading ~A" filename)))))))
 
 (defun load-memory-from-file-image (data)
-  (let ((length (length data))
-        (format (cffi:foreign-alloc '%al:enum))
-        (size (cffi:foreign-alloc :int))
-        (frequency (cffi:foreign-alloc '%al::ensure-float)))
-    (cffi:with-foreign-object (data-array :int length)
+  (let ((length (length data)))
+    (cffi:with-foreign-objects ((format '%al:enum)
+				(size :int)
+				(frequency '%al:ensure-float)
+				(data-array :int length))
       (loop for i below length
-         do (setf (cffi:mem-aref data-array :int i)
-                  (elt data i)))
+	    do (setf (cffi:mem-aref data-array :int i)
+		     (elt data i)))
       (values-list
        (cons
-        (%alut:load-memory-from-file-image data-array length format size frequency)
-        (handler-case
-            (list (cffi:mem-ref format '%al:enum)
-                  (cffi:mem-ref size :int)
-                  (cffi:mem-ref frequency '%al::ensure-float))
-          (error ()
-            (error "There was an error loading data"))))))))
+	(%alut:load-memory-from-file-image data-array length format size
+					   frequency)
+	(handler-case
+	    (list (cffi:mem-ref format '%al:enum)
+		  (cffi:mem-ref size :int)
+		  (cffi:mem-ref frequency '%al::ensure-float))
+	  (error ()
+	    (error "There was an error loading data"))))))))
 
 (defun load-memory-hello-world ()
-  (let ((format (cffi:foreign-alloc '%al:enum))
-        (size (cffi:foreign-alloc :int))
-        (frequency (cffi:foreign-alloc '%al::ensure-float)))
+  (cffi:with-foreign-objects ((format '%al:enum)
+			      (size :int)
+			      (frequency '%al:ensure-float))
     (values-list
      (cons
       (%alut:load-memory-hello-world format size frequency)
       (handler-case
-          (list (cffi:mem-ref format '%al:enum)
-                (cffi:mem-ref size :int)
-                (cffi:mem-ref frequency '%al::ensure-float))
-        (error ()
-          (error "There was an error loading memory!")))))))
+	  (list (cffi:mem-ref format '%al:enum)
+		(cffi:mem-ref size :int)
+		(cffi:mem-ref frequency '%al::ensure-float))
+	(error ()
+	  (error "There was an error loading memory!")))))))
 
 (defun load-memory-waveform (waveshape frequency phase duration)
-  (let ((format (cffi:foreign-alloc '%al:enum))
-        (size (cffi:foreign-alloc :int))
-        (freq (cffi:foreign-alloc '%al::ensure-float)))
+  (cffi:with-foreign-objects ((format '%al:enum)
+			      (size :int)
+			      (freq '%al:ensure-float))
     (values-list
      (cons
-      (%alut:load-memory-waveform waveshape frequency phase duration format size freq)
+      (%alut:load-memory-waveform waveshape frequency phase duration format
+				  size freq)
       (handler-case
-          (list (cffi:mem-ref format '%al:enum)
-                (cffi:mem-ref size :int)
-                (cffi:mem-ref freq '%al::ensure-float))
-        (error ()
-          (error "There was an error loading this waveform")))))))
+	  (list (cffi:mem-ref format '%al:enum)
+		(cffi:mem-ref size :int)
+		(cffi:mem-ref freq '%al::ensure-float))
+	(error ()
+	  (error "There was an error loading this waveform")))))))
 
 ;;;
 ;;; Misc

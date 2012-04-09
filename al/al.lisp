@@ -58,11 +58,9 @@
 (defun get-listener (param)
   (ecase param
     ((:gain)
-     (let* ((ptr (cffi:foreign-alloc :float))
-            (val (progn
-                   (%al:get-listener-f param ptr)
-                   (cffi:mem-ref ptr :float))))
-       val))
+     (cffi:with-foreign-object (ptr :float)
+       (%al:get-listener-f param ptr)
+       (cffi:mem-ref ptr :float)))
     ((:orientation)
      (cffi:with-foreign-object (listener-array :float 6)
        (%al:get-listener-fv param listener-array)
@@ -116,35 +114,26 @@
     ((:gain :pitch :min-gain :max-gain :reference-distance
             :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
             :sample-offset :byte-offset)
-     (let* ((ptr (cffi:foreign-alloc :float))
-            (val (progn
-                   (%al:get-source-f sid param ptr)
-                   (cffi:mem-ref ptr :float))))
-       val))
+     (cffi:with-foreign-object (ptr :float)
+       (%al:get-source-f sid param ptr)
+       (cffi:mem-ref ptr :float)))
     ((:looping :source-relative)
-     (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn
-                   (%al:get-source-i sid param ptr)
-                   (cffi:mem-ref ptr :int))))
-       (if (> val 0)
-           t nil)))
+     (cffi:with-foreign-object (ptr :int)
+       (%al:get-source-i sid param ptr)
+       (cffi:mem-ref ptr :boolean)))
     ((:source-type :buffer :buffers-queued :buffers-processed)
-     (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn
-                   (%al:get-source-i sid param ptr)
-                   (cffi:mem-ref ptr :int))))
-       val))
+     (cffi:with-foreign-object (ptr :int)
+       (%al:get-source-i sid param ptr)
+       (cffi:mem-ref ptr :int)))
     (:source-state
-     (let* ((ptr (cffi:foreign-alloc :int))
-            (val (progn
-                   (%al:get-source-i sid param ptr)
-                   (cffi:mem-ref ptr :int))))
-       (cffi:foreign-enum-keyword '%al:enum val)))
+     (cffi:with-foreign-object (ptr :int)
+       (%al:get-source-i sid param ptr)
+       (cffi:foreign-enum-keyword '%al:enum (cffi:mem-ref ptr :int))))
     ((:position :velocity :direction)
      (cffi:with-foreign-object (source-array :float 3)
        (%al:get-source-fv sid param source-array)
        (loop for i below 3
-          collect (cffi:mem-aref source-array :float i))))))
+	     collect (cffi:mem-aref source-array :float i))))))
 
 ;; Playback
 (defun source-play (sid)
@@ -204,11 +193,9 @@
   (%al:buffer-data bid format data size freq))
 
 (defun get-buffer (bid param)
-  (let* ((ptr (cffi:foreign-alloc :int))
-         (val (progn
-                (%al:get-buffer-i bid param ptr)
-                (cffi:mem-ref ptr :int))))
-    val))
+  (cffi:with-foreign-object (ptr :int)
+    (%al:get-buffer-i bid param ptr)
+    (cffi:mem-ref ptr :int)))
 
 ;;;
 ;;; Global parameters
