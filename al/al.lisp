@@ -169,7 +169,7 @@
   (cffi:with-foreign-object (buffer-array :uint n)
     (%al:gen-buffers n buffer-array)
     (loop for i below n
-       collect (cffi:mem-aref buffer-array :uint))))
+       collect (cffi:mem-aref buffer-array :uint i))))
 (defun delete-buffers (buffers)
   (let ((n (length buffers)))
     (cffi:with-foreign-object (buffer-array :uint n)
