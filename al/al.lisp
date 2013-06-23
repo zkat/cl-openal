@@ -79,7 +79,7 @@
   (cffi:with-foreign-object (source-array :uint n)
     (%al:gen-sources n source-array)
     (loop for i below n
-       collect (cffi:mem-aref source-array :uint))))
+       collect (cffi:mem-aref source-array :uint i))))
 (defun delete-sources (sources)
   (let ((n (length sources)))
     (cffi:with-foreign-object (source-array :uint n)
