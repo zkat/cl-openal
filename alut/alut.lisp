@@ -126,7 +126,7 @@
 
 (defmacro with-init (&body body)
   `(unwind-protect
-        (init)
-     (progn
-       ,@body)
+        (progn
+          (init)
+          ,@body)
      (alut:exit)))
