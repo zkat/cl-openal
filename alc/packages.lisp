@@ -20,6 +20,7 @@
 
 (defpackage #:cl-openal-alc
   (:use :cl)
+  (:import-from :al :defun-al :checkpoint)
   (:nicknames :alc)
   (:export
    #:load-libraries

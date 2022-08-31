@@ -21,6 +21,64 @@ order to use cl-alut (such as freealut).
 cl-openal should run on all major platforms, including Linux, the BSDs, OSX, and Windows. It should
 be usable by any Common Lisp implementation supported by CFFI.
 
+Error handling
+--------------
+
+**BREAKING CHANGE NOTICE:** The new error handling API represents a breaking change. It introduces
+`*PROPAGATE-ERRORS*` with the default value of `T`, which means that OpenAL operations which would
+previously fail silently will now signal `AL-ERROR` in case of an error. This is a better default,
+but will break well-written code using the old API that expects to do its own error checking using
+`GET-ERROR`. To restore the old behaviour, set `*PROPAGATE-ERRORS*` to `NIL**.
+
+**NOTE:** `AL:GET-ERROR`/`AL:CLEAR-ERROR` are distinct from `ALUT:GET-ERROR`/`ALUT:CLEAR-ERROR`,
+because the error handling in ALUT differs from error handling in OpenAL/ALC. Similarly, the
+condition reported for OpenAL/ALC errors is `AL-ERROR`, whereas for ALUT it's `ALUT-ERROR`. In
+previous versions, these symbols were accidentally merged. Code relying on the old behaviour will
+need to be updated (or converted to use automatic error checking, see below).
+
+By default, cl-openal will call `alGetError()`/`alutGetError` after every C operation and signal any
+errors via the `AL-ERROR`/`ALUT-ERROR` conditions. The specific error code be retrieved via
+`(AL:ERRCODE CONDITION)`.
+
+Previous versions of cl-openal did not have any provision for automatic error detection, and only
+provided `GET-ERROR` as a very thin wrapper around `alGetError()`. This not only requires user code to
+do its own error check after every operation, which is tedious and error-prone, but makes some
+operations inherently unsafe, as certain wrappers perform foreign memory accesses immediately after
+calling the underlying OpenAL functions, without any opportunity for the user to check for errors
+and abort. This means memory corruption is highly likely in those instances. This issue has been
+fixed, and even if `*PROPAGATE-ERRORS*` is `NIL`, all wrappers exported by packages `AL`, `ALC` and
+`ALUT` will now abort if any underlying C operations signals an error. In this case, the wrapper
+function will return `NIL`.
+
+If for some reason you need to use one of the low-level bindings in the `%AL` or `%ALC` packages,
+the macro `AL:DEFUN-AL` should be use instead of regular `DEFUN`. It automates clearing the error
+state at the beginning of the function, and the checking at the end, and exposes a local macro
+called `CHECKPOINT`, which should be inserted after every low-level operation, if it's not the last
+operation in the function definition. It will also ensure that `*PROPAGATE-ERRORS*` is respected.
+
+If you need to interact with the low-level bindings in `%ALUT`, a similar macro called `DEFUN-ALUT`
+is provided. It also automates error clearing and handling, but because the ALUT error reporting is
+different, it's simpler to use: there's no need to call `(CHECKPOINT)`, all CFFI calls are checked
+automatically.
+
+Thread safety
+-------------
+
+Unfortunately, the OpenAL specification is incomplete when it comes to thread safety. Although
+OpenAL contexts are specified to be thread safe, and a single OpenAL operation is atomic, the
+specification does not specify enough details to allow safe sharing of contexts between multiple
+threads. In particular, error handling through `alGetError()` is inherently not thread-safe, and if
+multiple threads perform operations on a single context simultaneously, they will have no way to
+tell whose operation caused the error being reported.
+
+cl-openal on its part is also not thread-safe in its error handling. If `*PROPAGATE-ERRORS*` is
+`NIL`, the mechanism uses the value of a special variable to store and report errors. Because
+special variable bindings are not visible across threads, retrieving the last error *will* break if
+done from multiple threads.
+
+For these reasons, **multiple threads should never access a single OpenAL context at the same
+time. Doing so is inherently unsafe and cannot be done without introducing race conditions.**
+
 Support
 -------
 

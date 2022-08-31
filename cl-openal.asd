@@ -4,7 +4,7 @@
   :maintainer "Kat Marchán <kzm@sykosomatic.org>"
   :author "Kat Marchán <kzm@sykosomatic.org>"
   :licence "public domain"
-  :depends-on (cffi)
+  :depends-on (cffi alexandria)
   :components
   ((:module al
             :components
