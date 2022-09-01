@@ -1,5 +1,98 @@
 (in-package :al)
 
+;; Errors
+(defvar *propagate-errors* t
+  "If set, PROPAGATE-ERROR will automatically be called after every operation. If NIL, it
+  is the user's responsibility to call GET-ERROR or PROPAGATE-ERROR")
+
+;; FIXME: What is OpenAL's contract when it comes to multithreaded code? The spec only
+;; seems to mention that ALC's contexts are thread-safe, but makes absolutely no mention
+;; of how errors when multiple threads are in use. As far as I can tell, it might be
+;; actually not specified, but in practice the error context is probably shared between
+;; threads: https://camlorn.net/posts/april2014/shortcomings-of-openal/
+;;
+;; This means that a DEFVAR will not reproduce the same behaviour, as in most implementations
+;; dynamic bindings are thread-local, but also it's probably not the best idea to be accessing
+;; OpenAL from multiple threads.
+(defvar *previous-error* nil
+  "Internal: If non-NIL, stores the previous error reported by `alGetError'. Needed to
+  implement PEEK-ERROR functionality")
+
+(define-condition al-error ()
+  ((%errcode :initarg :errcode :reader errcode))
+  (:report (lambda (c stream)
+             (format stream "OpenAL error ~A" (errcode c)))))
+
+(defun peek-error ()
+  "Peek the current error. If no peek has been performed since last time the error state
+was cleared, this call `alGetError' internally, but store it in a location inspected by
+GET-ERROR, so that it isn't cleared until the user has a chance to inspect it. If an error
+is already stored, return it immediately without touching the OpenAL error state.
+
+This function should be used by library code to avoid irretrevably clearing the AL error
+state if operating in *PROPAGATE-ERRORS* NIL mode. End-user code should not be using it
+unless implementing custom wrappers; see GET-ERROR and CLEAR-ERROR instead"
+  (if *previous-error*
+      *previous-error*
+      (setf *previous-error* (%al:get-error))))
+
+(defun get-error ()
+  "Get the last AL error. If PEEK-ERROR has been called previously, the stored value will
+be cleared and returned. Otherwise, `alGetError' will be called. If called between every
+AL operation, this will have the same effect of clearing the error state as the underlying
+`alGetError' does. However, to clear the error state no matter what previous operations
+were performed, even if the user code did not properly inspect it, CLEAR-ERROR is
+preferable"
+  (if *previous-error*
+      (prog1
+          *previous-error*
+        (setf *previous-error* nil))
+      (%al:get-error)))
+
+(defun clear-error ()
+  "Unconditionally clear the previous error state. This guarantees that the effects of
+previous PEEK-ERROR calls are undone, and that `alGetError' has been called. Returns the
+result of calling `alGetError'"
+  (setf *previous-error* nil)
+  (%al:get-error))
+
+(defun propagate-error ()
+  "Call GET-ERROR, and if an error is detected, signal it wrapped in AL-ERROR. If
+  OPERATION is provided, it will be included as context in the reported condition"
+  (let ((err (get-error)))
+    (unless (eq err :no-error)
+      (error 'al-error :errcode err))))
+
+(defmacro defun-al (name (&rest args) &body body)
+  "Helper macro to define a function wrapping an OpenAL operation. Functions just like
+  regular DEFUN, except for OpenAL error management:
+
+  * Before BODY, (CLEAR-ERROR) is called, so BODY is guaranteed to execute in a fresh
+    error context
+  * Inside BODY, a local macro CHECKPOINT is defined. Calling it will perform error
+    handling, the precise nature of which depends on the value of *PROPAGATE-ERRORS*:
+    - If *PROPAGATE-ERRORS* is set (default), (PROPAGATE-ERROR) will be called, and signal
+      if an error was detected
+    - If *PROPAGATE-ERRORS* is NIL (legacy behaviour), (PEEK-ERROR) will be called, and if
+      an error was detected, the function will immediately abort and return NIL
+  * (CHECKPOINT) should be inserted after every call to underlying OpenAL C functions, and
+    before any results are consumed. This ensures that no unsafe memory accesses can
+    happen if the operation failed. A call to CHECKPOINT will be appended at the end of
+    BODY automatically, so it's not necessary to add it manually"
+  (with-gensyms (error)
+   `(defun ,name (,@args)
+      (clear-error)
+      (macrolet ((checkpoint ()
+                   `(if *propagate-errors*
+                        (propagate-error)
+                        (let ((,',error (peek-error)))
+                          (unless (eq ,',error :no-error)
+                            (return-from ,',name))))))
+        (prog1
+            (progn
+              ,@body)
+          (checkpoint))))))
+
 ;;;; misc.
 (defun load-libraries ()
   (cffi:define-foreign-library al
@@ -10,37 +103,33 @@
   (cffi:use-foreign-library al))
 
 ;; Renderer State management
-(defun enable (capability)
+(defun-al enable (capability)
   (%al:enable capability))
-(defun disable (capability)
+(defun-al disable (capability)
   (%al:disable capability))
-(defun enabledp (capability)
+(defun-al enabledp (capability)
   (%al:is-enabled capability))
 
 ;; State retrieval
-(defun get-string (param)
+(defun-al get-string (param)
   (%al:get-string param))
-(defun get-boolean (param)
+(defun-al get-boolean (param)
   (%al:get-boolean param))
-(defun get-integer (param)
+(defun-al get-integer (param)
   (%al:get-integer param))
 
-;; Errors
-(defun get-error ()
-  (%al:get-error))
-
 ;; Extensions
-(defun extension-present-p (extension-string)
+(defun-al extension-present-p (extension-string)
   (%al:is-extension-present extension-string))
-(defun get-proc-address (fname)
+(defun-al get-proc-address (fname)
   (%al:get-proc-address fname))
-(defun get-enum-value (enum-name)
+(defun-al get-enum-value (enum-name)
   (%al:get-enum-value enum-name))
 
 ;;;
 ;;; Listener
 ;;;
-(defun listener (param value)
+(defun-al listener (param value)
   (ecase param
     ((:position :velocity)
      (assert (= 3 (length value)))
@@ -55,7 +144,7 @@
     ((:gain)
      (%al:listener-f param value))))
 
-(defun get-listener (param)
+(defun-al get-listener (param)
   (ecase param
     ((:gain)
      (cffi:with-foreign-object (ptr :float)
@@ -75,12 +164,14 @@
 ;;;
 ;;; Sources
 ;;;
-(defun gen-sources (n)
+(defun-al gen-sources (n)
   (cffi:with-foreign-object (source-array :uint n)
     (%al:gen-sources n source-array)
+    (checkpoint)
     (loop for i below n
        collect (cffi:mem-aref source-array :uint i))))
-(defun delete-sources (sources)
+
+(defun-al delete-sources (sources)
   (let ((n (length sources)))
     (cffi:with-foreign-object (source-array :uint n)
       (loop for i below n
@@ -88,15 +179,17 @@
              (cffi:mem-aref source-array :uint i)
              (elt sources i)))
       (%al:delete-sources n source-array))))
+
 (defun gen-source ()
   (car (gen-sources 1)))
+
 (defun delete-source (sid)
   (delete-sources (list sid)))
 
-(defun sourcep (sid)
+(defun-al sourcep (sid)
   (%al:is-source sid))
 
-(defun source (sid param value)
+(defun-al source (sid param value)
   (ecase param
     ((:gain :pitch :min-gain :max-gain :reference-distance :rolloff-factor :max-distance
             :sec-offset :sample-offset :byte-offset :cone-inner-angle :cone-outer-angle :cone-outer-gain)
@@ -109,7 +202,7 @@
      (assert (= 3 (length value)))
      (%al:source-3f sid param (elt value 0) (elt value 1) (elt value 2)))))
 
-(defun get-source (sid param)
+(defun-al get-source (sid param)
   (ecase param
     ((:gain :pitch :min-gain :max-gain :reference-distance
             :sec-offset :rolloff-factor :max-distance :cone-inner-angle :cone-outer-angle :cone-outer-gain
@@ -136,17 +229,17 @@
              collect (cffi:mem-aref source-array :float i))))))
 
 ;; Playback
-(defun source-play (sid)
+(defun-al source-play (sid)
   (%al:source-play sid))
-(defun source-stop (sid)
+(defun-al source-stop (sid)
   (%al:source-stop sid))
-(defun source-rewind (sid)
+(defun-al source-rewind (sid)
   (%al:source-rewind sid))
-(defun source-pause (sid)
+(defun-al source-pause (sid)
   (%al:source-pause sid))
 
 ;; queueing
-(defun source-queue-buffers (sid buffers)
+(defun-al source-queue-buffers (sid buffers)
   (let ((n (length buffers)))
     (cffi:with-foreign-object (buffer-array :uint n)
       (loop for i below n
@@ -154,10 +247,11 @@
                   (elt buffers i)))
       (%al:source-queue-buffers sid n buffer-array))))
 
-(defun source-unqueue-buffers (sid &optional (num-buffers 1))
+(defun-al source-unqueue-buffers (sid &optional (num-buffers 1))
   (cffi:with-foreign-object (buffer-array :uint)
     (setf (cffi:mem-ref buffer-array :uint) 0)
     (%al:source-unqueue-buffers sid num-buffers buffer-array)
+    (checkpoint)
     (unless (zerop (cffi:mem-ref buffer-array :uint))
       (loop for i below num-buffers
          collect (cffi:mem-aref buffer-array :uint i)))))
@@ -165,12 +259,14 @@
 ;;;
 ;;; Buffers
 ;;;
-(defun gen-buffers (n)
+(defun-al gen-buffers (n)
   (cffi:with-foreign-object (buffer-array :uint n)
     (%al:gen-buffers n buffer-array)
+    (checkpoint)
     (loop for i below n
        collect (cffi:mem-aref buffer-array :uint i))))
-(defun delete-buffers (buffers)
+
+(defun-al delete-buffers (buffers)
   (let ((n (length buffers)))
     (cffi:with-foreign-object (buffer-array :uint n)
       (loop for i below n
@@ -178,35 +274,38 @@
              (cffi:mem-aref buffer-array :uint i)
              (elt buffers i)))
       (%al:delete-buffers n buffer-array))))
+
 (defun gen-buffer ()
   (car (gen-buffers 1)))
+
 (defun delete-buffer (bid)
   (delete-buffers (list bid)))
 
-(defun bufferp (buffer-id)
+(defun-al bufferp (buffer-id)
   (%al:is-buffer buffer-id))
 
-(defun buffer (bid param value)
+(defun-al buffer (bid param value)
   (%al:buffer-i bid param value))
 
-(defun buffer-data (bid format data size freq)
+(defun-al buffer-data (bid format data size freq)
   (%al:buffer-data bid format data size freq))
 
-(defun get-buffer (bid param)
+(defun-al get-buffer (bid param)
   (cffi:with-foreign-object (ptr :int)
     (%al:get-buffer-i bid param ptr)
+    (checkpoint)
     (cffi:mem-ref ptr :int)))
 
 ;;;
 ;;; Global parameters
 ;;;
-(defun doppler-factor (value)
+(defun-al doppler-factor (value)
   (%al:doppler-factor value))
-(defun doppler-velocity (value)
+(defun-al doppler-velocity (value)
   (%al:doppler-velocity value))
-(defun speed-of-sound (value)
+(defun-al speed-of-sound (value)
   (%al:speed-of-sound value))
-(defun distance-model (model-param)
+(defun-al distance-model (model-param)
   (%al:distance-model model-param))
 
 
