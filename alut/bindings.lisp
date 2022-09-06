@@ -34,7 +34,7 @@
 (defcfun ("alutGetError" get-error) error)
 (defcfun ("alutGetErrorString" get-error-string) :string (err error))
 
-(define-condition alut-error ()
+(define-condition alut-error (error)
   ((%errcode :initarg :errcode :reader errcode))
   (:report (lambda (c stream)
              (format stream "ALUT error ~A" (errcode c)))))

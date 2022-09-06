@@ -18,7 +18,7 @@
   "Internal: If non-NIL, stores the previous error reported by `alGetError'. Needed to
   implement PEEK-ERROR functionality")
 
-(define-condition al-error ()
+(define-condition al-error (error)
   ((%errcode :initarg :errcode :reader errcode))
   (:report (lambda (c stream)
              (format stream "OpenAL error ~A" (errcode c)))))
