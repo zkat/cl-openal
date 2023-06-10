@@ -4,8 +4,8 @@
 (define-foreign-library alut
   (:windows "alut.dll" :calling-convention :stdcall)
   (:darwin (:or (:default "libalut") (:framework "alut")))
-  (:unix (:or "libalut.so" "libalut.so.0" "libalut.so.0.1.0"))
-  (t (:default ("libalut"))))
+  (:unix (:or "libalut.so.0.1.0" "libalut.so.0" "libalut.so"))
+  (t (:default "libalut")))
 (use-foreign-library alut)
 
 ;; Error handling, used by the rest of DEFCFUNs, so need to define it first
